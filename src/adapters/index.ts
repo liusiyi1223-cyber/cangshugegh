@@ -1,6 +1,7 @@
 import type { PlatformAdapter } from "./types";
 import { baiduAdapter } from "./baidu";
 import { bilibiliAdapter } from "./bilibili";
+import { channelsAdapter } from "./channels";
 import { douyinAdapter } from "./douyin";
 import { wechatAdapter } from "./wechat";
 import { weiboAdapter } from "./weibo";
@@ -14,6 +15,7 @@ export const adapters: PlatformAdapter[] = [
   douyinAdapter,
   weiboAdapter,
   baiduAdapter,
+  channelsAdapter,
   wechatAdapter,
 ];
 
