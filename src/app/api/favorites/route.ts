@@ -109,7 +109,7 @@ export async function POST(request: Request) {
   return NextResponse.json(favorite, { status: 201 });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   let user: { id: string; email: string };
   try {
     user = await requireUser();
@@ -120,8 +120,14 @@ export async function GET() {
     throw e;
   }
 
+  const { searchParams } = new URL(request.url);
+  const q = searchParams.get("q")?.trim();
+
   const favorites = await db.favorite.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
+    },
     orderBy: { createdAt: "desc" },
   });
 

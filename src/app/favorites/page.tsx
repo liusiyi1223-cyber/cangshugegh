@@ -90,6 +90,7 @@ function FavoriteItem({
 
 export default function FavoritesPage() {
   const [text, setText] = useState("");
+  const [q, setQ] = useState("");
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [message, setMessage] = useState("");
@@ -98,8 +99,10 @@ export default function FavoritesPage() {
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
 
-  const load = useCallback(async () => {
-    const res = await fetch("/api/favorites");
+  const load = useCallback(async (query?: string) => {
+    const res = await fetch(
+      query ? `/api/favorites?q=${encodeURIComponent(query)}` : "/api/favorites"
+    );
     if (res.status === 401) {
       setLoggedIn(false);
       return;
@@ -226,6 +229,18 @@ export default function FavoritesPage() {
       )}
 
       {message && <p className="mb-4 text-sm text-red-600">{message}</p>}
+
+      <div className="mb-4">
+        <input
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            load(e.target.value);
+          }}
+          placeholder="搜索标题…"
+          className="w-full rounded border border-gray-300 px-3 py-2"
+        />
+      </div>
 
       <ul className="space-y-4">
         {favorites.map((f) => (
