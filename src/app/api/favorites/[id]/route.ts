@@ -49,3 +49,30 @@ export async function PATCH(
   const favorite = await db.favorite.findUnique({ where: { id } });
   return NextResponse.json(favorite);
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  let user: { id: string; email: string };
+  try {
+    user = await requireUser();
+  } catch (e) {
+    if (e instanceof UnauthorizedError) {
+      return NextResponse.json({ error: "未登录" }, { status: 401 });
+    }
+    throw e;
+  }
+
+  const { id } = await params;
+
+  const result = await db.favorite.deleteMany({
+    where: { id, userId: user.id },
+  });
+
+  if (result.count === 0) {
+    return NextResponse.json({ error: "收藏不存在" }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true });
+}

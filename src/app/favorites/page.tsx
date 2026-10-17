@@ -46,6 +46,12 @@ function FavoriteItem({
     if (res.ok) onChanged();
   }
 
+  async function remove() {
+    if (!confirm("确定删除这条收藏？")) return;
+    const res = await fetch(`/api/favorites/${f.id}`, { method: "DELETE" });
+    if (res.ok) onChanged();
+  }
+
   return (
     <li
       className={`flex gap-3 rounded border p-3 ${
@@ -109,6 +115,13 @@ function FavoriteItem({
             className="ml-auto text-xs text-gray-500 hover:text-red-600"
           >
             {broken ? "恢复" : "标记失效"}
+          </button>
+          <button
+            type="button"
+            onClick={remove}
+            className="text-xs text-gray-500 hover:text-red-600"
+          >
+            删除
           </button>
         </div>
       </div>
