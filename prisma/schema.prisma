@@ -37,3 +37,12 @@ model Favorite {
   @@unique([userId, canonicalUrl])
   @@index([userId])
 }
+
+model FetchLog {
+  id        String   @id @default(cuid())
+  platform  String?
+  url       String
+  success   Boolean
+  error     String?
+  createdAt DateTime @default(now())
+}

@@ -6,6 +6,21 @@ import { db } from "@/lib/db";
 import { extractUrls } from "@/lib/extract";
 import { resolveUrl } from "@/lib/resolve";
 
+type FetchLogEntry = {
+  platform: string | null;
+  url: string;
+  success: boolean;
+  error?: string;
+};
+
+async function logFetch(entry: FetchLogEntry) {
+  try {
+    await db.fetchLog.create({ data: entry });
+  } catch {
+    // 日志失败不阻断主流程
+  }
+}
+
 export async function POST(request: Request) {
   let user: { id: string; email: string };
   try {
@@ -67,22 +82,52 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "未在文本中找到链接" }, { status: 422 });
   }
 
-  let platform: string;
-  let meta: FetchedMeta;
+  const inputUrl = urls[0];
+
+  let resolved: string;
   try {
-    const resolved = await resolveUrl(urls[0]);
-    const adapter = matchAdapter(resolved);
-    if (!adapter) {
-      return NextResponse.json({ error: "暂不支持该平台" }, { status: 422 });
-    }
-    platform = adapter.name;
-    meta = await adapter.fetchMeta(resolved);
+    resolved = await resolveUrl(inputUrl);
   } catch {
+    await logFetch({
+      platform: null,
+      url: inputUrl,
+      success: false,
+      error: "短链还原失败",
+    });
     return NextResponse.json(
-      { error: "抓取失败，请手动补标题", url: urls[0] },
+      { error: "抓取失败，请手动补标题", url: inputUrl },
       { status: 422 }
     );
   }
+
+  const adapter = matchAdapter(resolved);
+  if (!adapter) {
+    await logFetch({
+      platform: null,
+      url: inputUrl,
+      success: false,
+      error: "暂不支持该平台",
+    });
+    return NextResponse.json({ error: "暂不支持该平台" }, { status: 422 });
+  }
+
+  let meta: FetchedMeta;
+  try {
+    meta = await adapter.fetchMeta(resolved);
+  } catch (err) {
+    await logFetch({
+      platform: adapter.name,
+      url: inputUrl,
+      success: false,
+      error: err instanceof Error ? err.message : "未知错误",
+    });
+    return NextResponse.json(
+      { error: "抓取失败，请手动补标题", url: inputUrl },
+      { status: 422 }
+    );
+  }
+
+  await logFetch({ platform: adapter.name, url: inputUrl, success: true });
 
   const existing = await db.favorite.findUnique({
     where: {
@@ -98,7 +143,7 @@ export async function POST(request: Request) {
       userId: user.id,
       url: meta.canonicalUrl,
       canonicalUrl: meta.canonicalUrl,
-      platform,
+      platform: adapter.name,
       title: meta.title,
       cover: meta.cover,
       author: meta.author,
