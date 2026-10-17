@@ -17,13 +17,46 @@ export async function POST(request: Request) {
     throw e;
   }
 
-  let body: { text?: string };
+  let body: { text?: string; url?: string; title?: string; tags?: string[] };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "无效的请求体" }, { status: 400 });
   }
 
+  // 手动模式：用户直接给链接 + 标题（抓取失败时的降级路径）
+  if (body.url) {
+    const title = body.title?.trim();
+    if (!title) {
+      return NextResponse.json({ error: "请填写标题" }, { status: 400 });
+    }
+
+    const inputUrl = body.url;
+    const canonicalUrl = await resolveUrl(inputUrl).catch(() => inputUrl);
+    const platform = matchAdapter(canonicalUrl)?.name ?? "unknown";
+    const tags = Array.isArray(body.tags) ? body.tags : [];
+
+    const existing = await db.favorite.findUnique({
+      where: { userId_canonicalUrl: { userId: user.id, canonicalUrl } },
+    });
+    if (existing) {
+      return NextResponse.json({ ...existing, alreadyExists: true });
+    }
+
+    const favorite = await db.favorite.create({
+      data: {
+        userId: user.id,
+        url: canonicalUrl,
+        canonicalUrl,
+        platform,
+        title,
+        tags,
+      },
+    });
+    return NextResponse.json(favorite, { status: 201 });
+  }
+
+  // 自动模式：从分享文本提取并抓取
   const text = body.text?.trim();
   if (!text) {
     return NextResponse.json({ error: "请粘贴分享文本" }, { status: 400 });
@@ -45,12 +78,16 @@ export async function POST(request: Request) {
     platform = adapter.name;
     meta = await adapter.fetchMeta(resolved);
   } catch {
-    return NextResponse.json({ error: "抓取失败，请稍后重试" }, { status: 422 });
+    return NextResponse.json(
+      { error: "抓取失败，请手动补标题", url: urls[0] },
+      { status: 422 }
+    );
   }
 
-  const dedupKey = { userId: user.id, canonicalUrl: meta.canonicalUrl };
   const existing = await db.favorite.findUnique({
-    where: { userId_canonicalUrl: dedupKey },
+    where: {
+      userId_canonicalUrl: { userId: user.id, canonicalUrl: meta.canonicalUrl },
+    },
   });
   if (existing) {
     return NextResponse.json({ ...existing, alreadyExists: true });

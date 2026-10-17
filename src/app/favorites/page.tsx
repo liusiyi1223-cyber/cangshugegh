@@ -9,6 +9,8 @@ type Favorite = {
   author?: string | null;
   platform?: string | null;
   canonicalUrl: string;
+  status?: string;
+  tags?: string[];
 };
 
 export default function FavoritesPage() {
@@ -17,6 +19,9 @@ export default function FavoritesPage() {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showManual, setShowManual] = useState(false);
+  const [manualUrl, setManualUrl] = useState("");
+  const [manualTitle, setManualTitle] = useState("");
 
   const load = useCallback(async () => {
     const res = await fetch("/api/favorites");
@@ -50,6 +55,33 @@ export default function FavoritesPage() {
       await load();
     } else {
       setMessage(data.error ?? "出错了");
+      if (data.url) {
+        setManualUrl(data.url);
+        setShowManual(true);
+      }
+    }
+  }
+
+  async function onManualSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!manualUrl.trim() || !manualTitle.trim()) return;
+    setLoading(true);
+    setMessage("");
+    const res = await fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: manualUrl, title: manualTitle }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (res.ok) {
+      setManualUrl("");
+      setManualTitle("");
+      setShowManual(false);
+      setMessage(data.alreadyExists ? "已收藏过该视频" : "收藏成功");
+      await load();
+    } else {
+      setMessage(data.error ?? "出错了");
     }
   }
 
@@ -68,7 +100,7 @@ export default function FavoritesPage() {
     <main className="mx-auto max-w-2xl p-6">
       <h1 className="mb-4 text-xl font-semibold">我的收藏</h1>
 
-      <form onSubmit={onSubmit} className="mb-6 space-y-2">
+      <form onSubmit={onSubmit} className="mb-4 space-y-2">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -76,14 +108,47 @@ export default function FavoritesPage() {
           rows={3}
           className="w-full rounded border border-gray-300 px-3 py-2"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded bg-gray-800 px-4 py-2 text-white disabled:opacity-50"
-        >
-          {loading ? "收藏中…" : "收藏"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded bg-gray-800 px-4 py-2 text-white disabled:opacity-50"
+          >
+            {loading ? "收藏中…" : "收藏"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowManual((v) => !v)}
+            className="text-sm text-blue-600 underline"
+          >
+            {showManual ? "收起手动添加" : "手动添加"}
+          </button>
+        </div>
       </form>
+
+      {showManual && (
+        <form onSubmit={onManualSubmit} className="mb-4 space-y-2 rounded border border-gray-200 p-3">
+          <input
+            value={manualUrl}
+            onChange={(e) => setManualUrl(e.target.value)}
+            placeholder="视频链接"
+            className="w-full rounded border border-gray-300 px-3 py-2"
+          />
+          <input
+            value={manualTitle}
+            onChange={(e) => setManualTitle(e.target.value)}
+            placeholder="标题"
+            className="w-full rounded border border-gray-300 px-3 py-2"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded bg-gray-800 px-4 py-2 text-white disabled:opacity-50"
+          >
+            保存
+          </button>
+        </form>
+      )}
 
       {message && <p className="mb-4 text-sm text-red-600">{message}</p>}
 
