@@ -21,6 +21,7 @@ function FavoriteItem({
   onChanged: () => void;
 }) {
   const [tag, setTag] = useState("");
+  const broken = f.status === "BROKEN";
 
   async function addTag() {
     const t = tag.trim();
@@ -36,8 +37,21 @@ function FavoriteItem({
     }
   }
 
+  async function toggleStatus() {
+    const res = await fetch(`/api/favorites/${f.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: broken ? "ACTIVE" : "BROKEN" }),
+    });
+    if (res.ok) onChanged();
+  }
+
   return (
-    <li className="flex gap-3 rounded border border-gray-200 p-3">
+    <li
+      className={`flex gap-3 rounded border p-3 ${
+        broken ? "border-red-200 bg-red-50 opacity-70" : "border-gray-200"
+      }`}
+    >
       {f.cover && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -52,13 +66,20 @@ function FavoriteItem({
           href={f.canonicalUrl}
           target="_blank"
           rel="noreferrer"
-          className="block truncate font-medium text-blue-600 hover:underline"
+          className={`block truncate font-medium text-blue-600 hover:underline ${
+            broken ? "line-through" : ""
+          }`}
         >
           {f.title}
         </a>
         <p className="text-sm text-gray-500">
           {f.platform}
           {f.author ? ` · ${f.author}` : ""}
+          {broken && (
+            <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-600">
+              已失效
+            </span>
+          )}
         </p>
 
         <div className="mt-1 flex flex-wrap items-center gap-1">
@@ -82,6 +103,13 @@ function FavoriteItem({
             placeholder="+ 标签"
             className="w-20 rounded border border-gray-300 px-2 py-0.5 text-xs"
           />
+          <button
+            type="button"
+            onClick={toggleStatus}
+            className="ml-auto text-xs text-gray-500 hover:text-red-600"
+          >
+            {broken ? "恢复" : "标记失效"}
+          </button>
         </div>
       </div>
     </li>
