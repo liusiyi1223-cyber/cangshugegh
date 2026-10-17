@@ -2,6 +2,7 @@ import type { PlatformAdapter } from "./types";
 import { baiduAdapter } from "./baidu";
 import { bilibiliAdapter } from "./bilibili";
 import { douyinAdapter } from "./douyin";
+import { wechatAdapter } from "./wechat";
 import { weiboAdapter } from "./weibo";
 import { xiaohongshuAdapter } from "./xiaohongshu";
 import { zhihuAdapter } from "./zhihu";
@@ -13,6 +14,7 @@ export const adapters: PlatformAdapter[] = [
   douyinAdapter,
   weiboAdapter,
   baiduAdapter,
+  wechatAdapter,
 ];
 
 export function matchAdapter(url: string): PlatformAdapter | undefined {
