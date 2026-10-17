@@ -33,6 +33,7 @@ model Favorite {
   note         String?
   status       FavoriteStatus @default(ACTIVE)
   createdAt    DateTime       @default(now())
+  collections  Collection[]
 
   @@unique([userId, canonicalUrl])
   @@index([userId])
@@ -45,4 +46,14 @@ model FetchLog {
   success   Boolean
   error     String?
   createdAt DateTime @default(now())
+}
+
+model Collection {
+  id        String     @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime   @default(now())
+  favorites Favorite[]
+
+  @@index([userId])
 }

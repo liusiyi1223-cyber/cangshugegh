@@ -167,13 +167,20 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim();
+  const collectionId = searchParams.get("collectionId")?.trim();
 
   const favorites = await db.favorite.findMany({
     where: {
       userId: user.id,
       ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
+      ...(collectionId === "unfiled"
+        ? { collections: { none: {} } }
+        : collectionId
+          ? { collections: { some: { id: collectionId } } }
+          : {}),
     },
     orderBy: { createdAt: "desc" },
+    include: { collections: { select: { id: true, name: true } } },
   });
 
   return NextResponse.json(favorites);

@@ -2,6 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+type Collection = {
+  id: string;
+  name: string;
+  _count?: { favorites: number };
+};
+
 type Favorite = {
   id: string;
   title: string;
@@ -11,17 +17,40 @@ type Favorite = {
   canonicalUrl: string;
   status?: string;
   tags?: string[];
+  collections?: { id: string; name: string }[];
 };
 
 function FavoriteItem({
   f,
+  collections,
   onChanged,
 }: {
   f: Favorite;
+  collections: Collection[];
   onChanged: () => void;
 }) {
   const [tag, setTag] = useState("");
   const broken = f.status === "BROKEN";
+  const current = f.collections ?? [];
+  const currentIds = new Set(current.map((c) => c.id));
+  const addable = collections.filter((c) => !currentIds.has(c.id));
+
+  async function patchCollectionIds(collectionIds: string[]) {
+    const res = await fetch(`/api/favorites/${f.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ collectionIds }),
+    });
+    if (res.ok) onChanged();
+  }
+
+  function addToCollection(id: string) {
+    patchCollectionIds([...current.map((c) => c.id), id]);
+  }
+
+  function removeFromCollection(id: string) {
+    patchCollectionIds(current.map((c) => c.id).filter((cid) => cid !== id));
+  }
 
   async function addTag() {
     const t = tag.trim();
@@ -89,6 +118,40 @@ function FavoriteItem({
         </p>
 
         <div className="mt-1 flex flex-wrap items-center gap-1">
+          {current.map((c) => (
+            <span
+              key={c.id}
+              className="flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-700"
+            >
+              {c.name}
+              <button
+                type="button"
+                onClick={() => removeFromCollection(c.id)}
+                className="text-blue-400 hover:text-red-600"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          {addable.length > 0 && (
+            <select
+              value=""
+              onChange={(e) => {
+                if (e.target.value) addToCollection(e.target.value);
+              }}
+              className="rounded border border-gray-300 px-1 py-0.5 text-xs text-gray-500"
+            >
+              <option value="">+ 收藏夹</option>
+              {addable.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="mt-1 flex flex-wrap items-center gap-1">
           {(f.tags ?? []).map((t) => (
             <span
               key={t}
@@ -133,6 +196,9 @@ export default function FavoritesPage() {
   const [text, setText] = useState("");
   const [bookmarklet, setBookmarklet] = useState("");
   const [q, setQ] = useState("");
+  const [collectionFilter, setCollectionFilter] = useState("all");
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [newCollectionName, setNewCollectionName] = useState("");
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [message, setMessage] = useState("");
@@ -141,10 +207,12 @@ export default function FavoritesPage() {
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
 
-  const load = useCallback(async (query?: string) => {
-    const res = await fetch(
-      query ? `/api/favorites?q=${encodeURIComponent(query)}` : "/api/favorites"
-    );
+  const load = useCallback(async (query?: string, cid?: string) => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (cid && cid !== "all") params.set("collectionId", cid);
+    const qs = params.toString();
+    const res = await fetch(`/api/favorites${qs ? `?${qs}` : ""}`);
     if (res.status === 401) {
       setLoggedIn(false);
       return;
@@ -153,9 +221,15 @@ export default function FavoritesPage() {
     if (res.ok) setFavorites(await res.json());
   }, []);
 
+  const loadCollections = useCallback(async () => {
+    const res = await fetch("/api/collections");
+    if (res.ok) setCollections(await res.json());
+  }, []);
+
   useEffect(() => {
     load();
-  }, [load]);
+    loadCollections();
+  }, [load, loadCollections]);
 
   useEffect(() => {
     setBookmarklet(
@@ -164,6 +238,39 @@ export default function FavoritesPage() {
     const url = new URLSearchParams(window.location.search).get("url");
     if (url) setText(url);
   }, []);
+
+  const refresh = useCallback(() => {
+    load(q, collectionFilter);
+  }, [load, q, collectionFilter]);
+
+  function selectCollection(cid: string) {
+    setCollectionFilter(cid);
+    load(q, cid);
+  }
+
+  async function createCollection() {
+    const name = newCollectionName.trim();
+    if (!name) return;
+    const res = await fetch("/api/collections", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    if (res.ok) {
+      setNewCollectionName("");
+      await loadCollections();
+    }
+  }
+
+  async function deleteCollection(id: string) {
+    if (!confirm("删除该收藏夹？收藏本身不会被删除。")) return;
+    const res = await fetch(`/api/collections/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      if (collectionFilter === id) setCollectionFilter("all");
+      await loadCollections();
+      await load(q, collectionFilter === id ? "all" : collectionFilter);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -180,7 +287,7 @@ export default function FavoritesPage() {
     if (res.ok) {
       setText("");
       setMessage(data.alreadyExists ? "已收藏过该视频" : "收藏成功");
-      await load();
+      await load(q, collectionFilter);
     } else {
       setMessage(data.error ?? "出错了");
       if (data.url) {
@@ -207,7 +314,7 @@ export default function FavoritesPage() {
       setManualTitle("");
       setShowManual(false);
       setMessage(data.alreadyExists ? "已收藏过该视频" : "收藏成功");
-      await load();
+      await load(q, collectionFilter);
     } else {
       setMessage(data.error ?? "出错了");
     }
@@ -224,9 +331,55 @@ export default function FavoritesPage() {
     );
   }
 
+  const chipClass = (active: boolean) =>
+    `rounded px-3 py-1 text-sm ${
+      active ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+    }`;
+
   return (
     <main className="mx-auto max-w-2xl p-6">
       <h1 className="mb-4 text-xl font-semibold">我的收藏</h1>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button onClick={() => selectCollection("all")} className={chipClass(collectionFilter === "all")}>
+          全部
+        </button>
+        <button onClick={() => selectCollection("unfiled")} className={chipClass(collectionFilter === "unfiled")}>
+          未分类
+        </button>
+        {collections.map((c) => (
+          <span key={c.id} className="flex items-center gap-1">
+            <button onClick={() => selectCollection(c.id)} className={chipClass(collectionFilter === c.id)}>
+              {c.name} ({c._count?.favorites ?? 0})
+            </button>
+            <button
+              onClick={() => deleteCollection(c.id)}
+              className="text-xs text-gray-400 hover:text-red-600"
+              title="删除收藏夹"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        <input
+          value={newCollectionName}
+          onChange={(e) => setNewCollectionName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              createCollection();
+            }
+          }}
+          placeholder="新建收藏夹"
+          className="w-28 rounded border border-gray-300 px-2 py-1 text-sm"
+        />
+        <button
+          onClick={createCollection}
+          className="rounded bg-gray-800 px-3 py-1 text-sm text-white"
+        >
+          新建
+        </button>
+      </div>
 
       <form onSubmit={onSubmit} className="mb-4 space-y-2">
         <textarea
@@ -285,7 +438,7 @@ export default function FavoritesPage() {
           value={q}
           onChange={(e) => {
             setQ(e.target.value);
-            load(e.target.value);
+            load(e.target.value, collectionFilter);
           }}
           placeholder="搜索标题…"
           className="w-full rounded border border-gray-300 px-3 py-2"
@@ -294,7 +447,7 @@ export default function FavoritesPage() {
 
       <ul className="space-y-4">
         {favorites.map((f) => (
-          <FavoriteItem key={f.id} f={f} onChanged={load} />
+          <FavoriteItem key={f.id} f={f} collections={collections} onChanged={refresh} />
         ))}
         {favorites.length === 0 && (
           <p className="text-gray-500">还没有收藏，粘贴一个链接试试。</p>
