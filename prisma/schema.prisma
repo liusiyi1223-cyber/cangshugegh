@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum FavoriteStatus {
+  ACTIVE
+  BROKEN
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  favorites    Favorite[]
+}
+
+model Favorite {
+  id           String         @id @default(cuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  url          String
+  canonicalUrl String
+  platform     String?
+  title        String
+  cover        String?
+  author       String?
+  tags         String[]
+  note         String?
+  status       FavoriteStatus @default(ACTIVE)
+  createdAt    DateTime       @default(now())
+
+  @@unique([userId, canonicalUrl])
+  @@index([userId])
+}
