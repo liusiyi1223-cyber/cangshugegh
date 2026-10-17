@@ -56,6 +56,9 @@ export const xiaohongshuAdapter: PlatformAdapter = {
     const ogUrl = $('meta[property="og:url"]').attr("content");
 
     if (!title) throw new Error("未能解析标题");
+    if (/页面不见了|Sorry|不存在|404/i.test(title)) {
+      throw new Error("抓取失败：页面不存在");
+    }
 
     const canonicalUrl = absolutize(ogUrl || url, url);
 
