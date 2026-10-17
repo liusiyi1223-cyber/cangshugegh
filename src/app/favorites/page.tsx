@@ -13,6 +13,81 @@ type Favorite = {
   tags?: string[];
 };
 
+function FavoriteItem({
+  f,
+  onChanged,
+}: {
+  f: Favorite;
+  onChanged: () => void;
+}) {
+  const [tag, setTag] = useState("");
+
+  async function addTag() {
+    const t = tag.trim();
+    if (!t) return;
+    const res = await fetch(`/api/favorites/${f.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tags: [...(f.tags ?? []), t] }),
+    });
+    if (res.ok) {
+      setTag("");
+      onChanged();
+    }
+  }
+
+  return (
+    <li className="flex gap-3 rounded border border-gray-200 p-3">
+      {f.cover && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={f.cover}
+          alt=""
+          referrerPolicy="no-referrer"
+          className="h-16 w-24 shrink-0 rounded object-cover"
+        />
+      )}
+      <div className="min-w-0 flex-1">
+        <a
+          href={f.canonicalUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="block truncate font-medium text-blue-600 hover:underline"
+        >
+          {f.title}
+        </a>
+        <p className="text-sm text-gray-500">
+          {f.platform}
+          {f.author ? ` · ${f.author}` : ""}
+        </p>
+
+        <div className="mt-1 flex flex-wrap items-center gap-1">
+          {(f.tags ?? []).map((t) => (
+            <span
+              key={t}
+              className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+            >
+              {t}
+            </span>
+          ))}
+          <input
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addTag();
+              }
+            }}
+            placeholder="+ 标签"
+            className="w-20 rounded border border-gray-300 px-2 py-0.5 text-xs"
+          />
+        </div>
+      </div>
+    </li>
+  );
+}
+
 export default function FavoritesPage() {
   const [text, setText] = useState("");
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -154,31 +229,7 @@ export default function FavoritesPage() {
 
       <ul className="space-y-4">
         {favorites.map((f) => (
-          <li key={f.id} className="flex gap-3 rounded border border-gray-200 p-3">
-            {f.cover && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={f.cover}
-                alt=""
-                referrerPolicy="no-referrer"
-                className="h-16 w-24 shrink-0 rounded object-cover"
-              />
-            )}
-            <div className="min-w-0">
-              <a
-                href={f.canonicalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="block truncate font-medium text-blue-600 hover:underline"
-              >
-                {f.title}
-              </a>
-              <p className="text-sm text-gray-500">
-                {f.platform}
-                {f.author ? ` · ${f.author}` : ""}
-              </p>
-            </div>
-          </li>
+          <FavoriteItem key={f.id} f={f} onChanged={load} />
         ))}
         {favorites.length === 0 && (
           <p className="text-gray-500">还没有收藏，粘贴一个链接试试。</p>
