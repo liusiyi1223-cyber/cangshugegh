@@ -131,6 +131,7 @@ function FavoriteItem({
 
 export default function FavoritesPage() {
   const [text, setText] = useState("");
+  const [bookmarklet, setBookmarklet] = useState("");
   const [q, setQ] = useState("");
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
@@ -155,6 +156,14 @@ export default function FavoritesPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    setBookmarklet(
+      `javascript:(function(){location.href='${window.location.origin}/favorites?url='+encodeURIComponent(location.href)})()`
+    );
+    const url = new URLSearchParams(window.location.search).get("url");
+    if (url) setText(url);
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -291,6 +300,21 @@ export default function FavoritesPage() {
           <p className="text-gray-500">还没有收藏，粘贴一个链接试试。</p>
         )}
       </ul>
+
+      <details className="mt-6 text-sm text-gray-600">
+        <summary className="cursor-pointer">书签小工具（一键收藏）</summary>
+        <p className="mt-2">
+          把下面这个链接拖到浏览器书签栏。之后在任意视频页点一下，就会跳转到本页并自动填好链接，再点「收藏」即可。
+        </p>
+        <p className="mt-2">
+          <a
+            href={bookmarklet}
+            className="rounded bg-gray-100 px-3 py-1 text-blue-600 underline"
+          >
+            收藏到本页
+          </a>
+        </p>
+      </details>
     </main>
   );
 }
