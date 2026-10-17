@@ -6,6 +6,7 @@ import { douyinAdapter } from "./douyin";
 import { wechatAdapter } from "./wechat";
 import { weiboAdapter } from "./weibo";
 import { xiaohongshuAdapter } from "./xiaohongshu";
+import { youtubeAdapter } from "./youtube";
 import { zhihuAdapter } from "./zhihu";
 
 export const adapters: PlatformAdapter[] = [
@@ -17,6 +18,7 @@ export const adapters: PlatformAdapter[] = [
   baiduAdapter,
   channelsAdapter,
   wechatAdapter,
+  youtubeAdapter,
 ];
 
 export function matchAdapter(url: string): PlatformAdapter | undefined {
