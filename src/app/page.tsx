@@ -1,5 +1,76 @@
-import { redirect } from "next/navigation";
+import { Bookmark, Clapperboard, Cloud } from "lucide-react";
+import {
+  SiBilibili,
+  SiSinaweibo,
+  SiTiktok,
+  SiWechat,
+  SiXiaohongshu,
+  SiYoutube,
+  SiZhihu,
+} from "@icons-pack/react-simple-icons";
 
-export default function Home() {
-  redirect("/favorites");
+const platforms = [
+  { name: "哔哩哔哩", Icon: SiBilibili },
+  { name: "抖音", Icon: SiTiktok },
+  { name: "小红书", Icon: SiXiaohongshu },
+  { name: "知乎", Icon: SiZhihu },
+  { name: "微博", Icon: SiSinaweibo },
+  { name: "微信", Icon: SiWechat },
+  { name: "视频号", Icon: Clapperboard },
+  { name: "YouTube", Icon: SiYoutube },
+];
+
+export default function WelcomePage() {
+  return (
+    <main className="flex min-h-dvh flex-col bg-white px-6">
+      <div className="flex flex-1 flex-col items-center justify-center py-12">
+        <div className="relative">
+          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-brand-soft text-brand">
+            <Cloud size={40} strokeWidth={1.5} />
+          </div>
+          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl bg-brand text-white">
+            <Bookmark size={16} strokeWidth={2} />
+          </div>
+        </div>
+
+        <h1 className="mt-7 text-2xl font-bold tracking-tight text-ink">
+          我的云收藏夹
+        </h1>
+        <p className="mt-2.5 text-sm text-muted">
+          把分散在各个平台的喜欢，收藏到这里。
+        </p>
+
+        <div className="mt-11 grid grid-cols-4 gap-x-6 gap-y-7">
+          {platforms.map(({ name, Icon }) => (
+            <div
+              key={name}
+              className="flex flex-col items-center gap-2"
+            >
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-[#647584]">
+                <Icon size={22} />
+              </div>
+              <span className="text-[11px] text-muted">{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-sm pb-10">
+        <a
+          href="/login"
+          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-brand text-[15px] font-semibold text-white"
+        >
+          登录
+        </a>
+        <div className="mt-4 text-center">
+          <a
+            href="/register"
+            className="text-sm text-muted"
+          >
+            没有账号？<span className="text-brand font-medium">注册</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  );
 }

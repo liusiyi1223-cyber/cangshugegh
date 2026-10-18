@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "互联网总收藏夹",
-  description: "把分散在各视频平台的收藏整理到一个地方",
+  title: "我的云收藏夹",
+  description: "把分散在各平台的收藏，集中管理",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
