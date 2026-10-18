@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bookmark, Search, UserRound, X } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
 import { PLATFORMS } from "@/lib/platforms";
+import { extractTitle } from "@/lib/extract";
 import BottomNav from "@/components/mobile/BottomNav";
 import FavoriteActionSheet from "@/components/mobile/FavoriteActionSheet";
 import FavoriteCard from "@/components/mobile/FavoriteCard";
@@ -23,6 +24,7 @@ export default function FavoritesPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [shareText, setShareText] = useState("");
+  const [shareTitle, setShareTitle] = useState("");
   const [showManual, setShowManual] = useState(false);
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
@@ -103,6 +105,7 @@ export default function FavoritesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text,
+        title: shareTitle || undefined,
         tags: parseTags(shareTags),
         platform: sharePlatform,
       }),
@@ -163,22 +166,13 @@ export default function FavoritesPage() {
           </span>
           我的云收藏夹
         </a>
-        <div className="flex gap-2">
-          <button
-            onClick={() => document.getElementById("searchbox")?.focus()}
-            aria-label="搜索"
-            className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-[#65717c]"
-          >
-            <Search size={18} strokeWidth={1.8} />
-          </button>
-          <a
-            href="/me"
-            aria-label="个人中心"
-            className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-[#65717c]"
-          >
-            <UserRound size={18} strokeWidth={1.8} />
-          </a>
-        </div>
+        <a
+          href="/me"
+          aria-label="个人中心"
+          className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-[#65717c]"
+        >
+          <UserRound size={18} strokeWidth={1.8} />
+        </a>
       </header>
 
       <main className="mx-auto w-full max-w-[1000px] px-4 pt-5">
@@ -234,8 +228,18 @@ export default function FavoritesPage() {
             aria-label="平台分享文本"
             placeholder="粘贴来自 B 站、小红书、抖音等平台的分享文本…"
             value={shareText}
-            onChange={(e) => setShareText(e.target.value)}
+            onChange={(e) => {
+              setShareText(e.target.value);
+              const t = extractTitle(e.target.value);
+              if (t) setShareTitle(t);
+            }}
             className="min-h-[60px] w-full resize-y border-0 bg-transparent text-[13px] text-ink outline-none placeholder:text-muted"
+          />
+          <input
+            value={shareTitle}
+            onChange={(e) => setShareTitle(e.target.value)}
+            placeholder="标题（自动识别，可修改）"
+            className="w-full rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
           />
           {userTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -376,7 +380,7 @@ export default function FavoritesPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3">
+          <div className="columns-2 gap-2.5 md:columns-3">
             {filtered.map((f) => (
               <FavoriteCard key={f.id} favorite={f} onOpen={setActiveFavorite} />
             ))}

@@ -1,8 +1,8 @@
 "use client";
 
-import { Bookmark, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
-import { platformName } from "@/lib/platforms";
+import { platformColor, platformIcon, platformName } from "@/lib/platforms";
 
 export default function FavoriteCard({
   favorite,
@@ -16,7 +16,7 @@ export default function FavoriteCard({
 
   return (
     <article
-      className={`overflow-hidden rounded-[14px] border border-sand bg-white shadow-sm ${
+      className={`mb-2.5 break-inside-avoid overflow-hidden rounded-[14px] border border-sand bg-white shadow-sm ${
         broken ? "opacity-60" : ""
       }`}
     >
@@ -24,7 +24,7 @@ export default function FavoriteCard({
         href={favorite.url}
         target="_blank"
         rel="noreferrer"
-        className="relative block aspect-[16/10] overflow-hidden bg-brand-soft"
+        className="relative block overflow-hidden bg-brand-soft"
       >
         {favorite.cover ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -33,11 +33,17 @@ export default function FavoriteCard({
             alt=""
             loading="lazy"
             referrerPolicy="no-referrer"
-            className={`h-full w-full object-cover ${broken ? "grayscale" : ""}`}
+            className={`block h-auto w-full ${broken ? "grayscale" : ""}`}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-muted">
-            <Bookmark size={28} strokeWidth={1.5} />
+          <div
+            className="flex aspect-[16/10] w-full items-center justify-center bg-brand-soft"
+            style={{ color: platformColor(favorite.platform) }}
+          >
+            {(() => {
+              const Icon = platformIcon(favorite.platform);
+              return <Icon size={64} />;
+            })()}
           </div>
         )}
         {broken && (
@@ -52,7 +58,7 @@ export default function FavoriteCard({
           href={favorite.url}
           target="_blank"
           rel="noreferrer"
-          className={`line-clamp-2 min-h-[39px] text-[13px] font-semibold leading-snug text-ink ${
+          className={`line-clamp-3 text-[13px] font-semibold leading-snug text-ink ${
             broken ? "line-through" : ""
           }`}
         >

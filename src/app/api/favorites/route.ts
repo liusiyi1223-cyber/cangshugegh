@@ -131,7 +131,7 @@ export async function POST(request: Request) {
           inputUrl,
           fallbackMeta.canonicalUrl,
           body.platform || fallbackAdapter.name,
-          textTitle || fallbackMeta.title,
+          body.title || textTitle || fallbackMeta.title,
           fallbackMeta.cover,
           fallbackMeta.author
         );
@@ -145,12 +145,11 @@ export async function POST(request: Request) {
       success: false,
       error: "短链还原失败",
     });
-    if (textTitle || body.platform) {
-      return save(inputUrl, inputUrl, body.platform || "unknown", textTitle);
-    }
-    return NextResponse.json(
-      { error: "抓取失败，请手动补标题", url: inputUrl },
-      { status: 422 }
+    return save(
+      inputUrl,
+      inputUrl,
+      body.platform || "unknown",
+      body.title || textTitle || "未命名收藏"
     );
   }
 
@@ -163,10 +162,7 @@ export async function POST(request: Request) {
       success: false,
       error: "暂不支持该平台",
     });
-    if (textTitle || body.platform) {
-      return save(inputUrl, resolved, platform, textTitle);
-    }
-    return NextResponse.json({ error: "暂不支持该平台" }, { status: 422 });
+    return save(inputUrl, resolved, platform, body.title || textTitle || "未命名收藏");
   }
 
   let meta: FetchedMeta;
@@ -179,13 +175,7 @@ export async function POST(request: Request) {
       success: false,
       error: err instanceof Error ? err.message : "未知错误",
     });
-    if (textTitle) {
-      return save(resolved, resolved, platform, textTitle);
-    }
-    return NextResponse.json(
-      { error: "抓取失败，请手动补标题", url: inputUrl },
-      { status: 422 }
-    );
+    return save(resolved, resolved, platform, body.title || textTitle || "未命名收藏");
   }
 
   await logFetch({ platform, url: inputUrl, success: true });
@@ -194,7 +184,7 @@ export async function POST(request: Request) {
     meta.canonicalUrl,
     meta.canonicalUrl,
     platform,
-    textTitle || meta.title,
+    body.title || textTitle || meta.title,
     meta.cover,
     meta.author
   );

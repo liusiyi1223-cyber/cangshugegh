@@ -125,7 +125,7 @@ export default function FavoriteActionSheet({
               onClick={() => setTagOpen(true)}
             >
               <Tag className={iconClass} strokeWidth={1.8} />
-              <span>编辑标签</span>
+              <span>编辑</span>
             </button>
 
             <button

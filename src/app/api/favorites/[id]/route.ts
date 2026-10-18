@@ -18,7 +18,7 @@ export async function PATCH(
 
   const { id } = await params;
 
-  let body: { tags?: string[]; status?: string; collectionIds?: string[] };
+  let body: { tags?: string[]; status?: string; title?: string; collectionIds?: string[] };
   try {
     body = await request.json();
   } catch {
@@ -33,9 +33,14 @@ export async function PATCH(
   const data: {
     tags?: string[];
     status?: "ACTIVE" | "BROKEN";
+    title?: string;
     collections?: { set: { id: string }[] };
   } = {};
 
+  if (typeof body.title === "string") {
+    const t = body.title.trim();
+    if (t) data.title = t;
+  }
   if (Array.isArray(body.tags)) {
     data.tags = body.tags.filter((t): t is string => typeof t === "string");
   }
