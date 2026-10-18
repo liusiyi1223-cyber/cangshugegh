@@ -46,8 +46,8 @@ export default function FavoriteCard({
               <div
                 className="flex aspect-[16/10] w-full items-center justify-center"
                 style={{
-                  backgroundColor: platformColor(favorite.platform),
-                  color: "#ffffff",
+                  backgroundColor: "#ffffff",
+                  color: platformColor(favorite.platform),
                 }}
               >
                 <Icon size={48} className={broken ? "opacity-70" : ""} />
