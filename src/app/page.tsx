@@ -1,6 +1,8 @@
-import { Bookmark, Clapperboard, Cloud } from "lucide-react";
+import { Bookmark, Cloud } from "lucide-react";
+import { platformColor } from "@/lib/platforms";
 import {
   SiBilibili,
+  SiInstagram,
   SiSinaweibo,
   SiTiktok,
   SiWechat,
@@ -10,14 +12,14 @@ import {
 } from "@icons-pack/react-simple-icons";
 
 const platforms = [
-  { name: "哔哩哔哩", Icon: SiBilibili },
-  { name: "抖音", Icon: SiTiktok },
-  { name: "小红书", Icon: SiXiaohongshu },
-  { name: "知乎", Icon: SiZhihu },
-  { name: "微博", Icon: SiSinaweibo },
-  { name: "微信", Icon: SiWechat },
-  { name: "视频号", Icon: Clapperboard },
-  { name: "YouTube", Icon: SiYoutube },
+  { key: "bilibili", name: "哔哩哔哩", Icon: SiBilibili },
+  { key: "douyin", name: "抖音", Icon: SiTiktok },
+  { key: "xiaohongshu", name: "小红书", Icon: SiXiaohongshu },
+  { key: "zhihu", name: "知乎", Icon: SiZhihu },
+  { key: "weibo", name: "微博", Icon: SiSinaweibo },
+  { key: "wechat", name: "微信", Icon: SiWechat },
+  { key: "instagram", name: "Instagram", Icon: SiInstagram },
+  { key: "youtube", name: "YouTube", Icon: SiYoutube },
 ];
 
 export default function WelcomePage() {
@@ -41,13 +43,16 @@ export default function WelcomePage() {
         </p>
 
         <div className="mt-11 grid grid-cols-4 gap-x-6 gap-y-7">
-          {platforms.map(({ name, Icon }) => (
+          {platforms.map(({ key, name, Icon }) => (
             <div
-              key={name}
+              key={key}
               className="flex flex-col items-center gap-2"
             >
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-[#647584]">
-                <Icon size={22} />
+              <div
+                className="grid h-14 w-14 place-items-center rounded-full"
+                style={{ backgroundColor: platformColor(key), color: "#ffffff" }}
+              >
+                <Icon size={24} />
               </div>
               <span className="text-[11px] text-muted">{name}</span>
             </div>

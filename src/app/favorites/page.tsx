@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Bookmark, Search, UserRound, X } from "lucide-react";
+import { Bookmark, Menu, Palette, Search, UserRound, X } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
 import { PLATFORMS } from "@/lib/platforms";
 import { extractTitle } from "@/lib/extract";
+import { extractDominantColor } from "@/lib/image";
 import BottomNav from "@/components/mobile/BottomNav";
 import FavoriteActionSheet from "@/components/mobile/FavoriteActionSheet";
+import BottomSheet from "@/components/mobile/BottomSheet";
 import FavoriteCard from "@/components/mobile/FavoriteCard";
 
 function parseTags(s: string): string[] {
@@ -15,6 +17,16 @@ function parseTags(s: string): string[] {
     .map((t) => t.trim())
     .filter(Boolean);
 }
+
+const THEME_COLORS = [
+  { key: "blue", name: "墨蓝", value: "#243342" },
+  { key: "orange", name: "陶土橙", value: "#C96F4A" },
+  { key: "green", name: "翠绿", value: "#16A34A" },
+  { key: "indigo", name: "靛蓝", value: "#4F46E5" },
+  { key: "purple", name: "紫色", value: "#7C3AED" },
+  { key: "pink", name: "粉色", value: "#DB2777" },
+  { key: "red", name: "红色", value: "#DC2626" },
+];
 
 export default function FavoritesPage() {
   const [items, setItems] = useState<FavoriteWithCollections[]>([]);
@@ -31,6 +43,10 @@ export default function FavoritesPage() {
   const [shareTags, setShareTags] = useState("");
   const [sharePlatform, setSharePlatform] = useState("other");
   const [userTags, setUserTags] = useState<string[]>([]);
+  const [userName, setUserName] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [themeColor, setThemeColor] = useState("#243342");
   const [manualPlatform, setManualPlatform] = useState("bilibili");
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
     null
@@ -48,13 +64,32 @@ export default function FavoritesPage() {
       return;
     }
     if (fr.ok) setItems(await fr.json());
-    if (ur.ok) setUserTags((await ur.json()).tags ?? []);
+    if (ur.ok) {
+      const u = await ur.json();
+      setUserTags(u.tags ?? []);
+      setUserName(u.name ?? "");
+      setUserAvatar(u.avatar ?? "");
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("themeColor");
+    if (saved) {
+      setThemeColor(saved);
+      document.documentElement.style.setProperty("--color-brand", saved);
+    }
+  }, []);
+
+  function applyThemeColor(value: string) {
+    setThemeColor(value);
+    document.documentElement.style.setProperty("--color-brand", value);
+    localStorage.setItem("themeColor", value);
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -115,6 +150,7 @@ export default function FavoritesPage() {
     if (res.ok) {
       await syncNewTags(shareTags);
       setShareText("");
+      setShareTitle("");
       setShareTags("");
       setShowManual(false);
       await load();
@@ -147,6 +183,7 @@ export default function FavoritesPage() {
     if (res.ok) {
       await syncNewTags(shareTags);
       setShareText("");
+      setShareTitle("");
       setShareTags("");
       setManualUrl("");
       setManualTitle("");
@@ -160,61 +197,32 @@ export default function FavoritesPage() {
   return (
     <div className="min-h-dvh bg-white pb-[90px]">
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-sand bg-white px-4">
-        <a href="/favorites" className="flex items-center gap-2 text-base font-bold tracking-tight">
-          <span className="grid h-7 w-7 place-items-center rounded-[9px] bg-brand-soft text-brand">
-            <Bookmark size={17} strokeWidth={2} />
-          </span>
-          我的云收藏夹
-        </a>
+        <button
+          onClick={() => setMenuOpen(true)}
+          aria-label="菜单"
+          className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-[#65717c]"
+        >
+          <Menu size={20} strokeWidth={1.8} />
+        </button>
         <a
           href="/me"
           aria-label="个人中心"
-          className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-[#65717c]"
+          className="grid h-[38px] w-[38px] place-items-center overflow-hidden rounded-full border border-sand bg-white"
         >
-          <UserRound size={18} strokeWidth={1.8} />
+          {userAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={userAvatar}
+              alt="头像"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <UserRound size={18} strokeWidth={1.8} className="text-[#65717c]" />
+          )}
         </a>
       </header>
 
-      <main className="mx-auto w-full max-w-[1000px] px-4 pt-5">
-        <div className="mb-3.5">
-          <h2 className="text-lg font-bold tracking-tight">我的收藏</h2>
-          <p className="mt-1 text-xs text-muted">{items.length} 条收藏</p>
-        </div>
-
-        <div className="mb-3 flex h-11 items-center gap-2 rounded-[13px] bg-[#f7f8fa] px-3 text-muted">
-          <Search size={17} strokeWidth={1.8} />
-          <input
-            id="searchbox"
-            placeholder="搜索标题、作者或标签…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full border-0 bg-transparent text-ink outline-none"
-          />
-          {query && (
-            <button onClick={() => setQuery("")} aria-label="清除搜索">
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        <div className="mb-3 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {[{ key: "all", name: "全部" }, ...PLATFORMS].map(
-            (p) => (
-              <button
-                key={p.key}
-                onClick={() => setFilter(p.key)}
-                className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 text-xs ${
-                  filter === p.key
-                    ? "bg-brand text-white"
-                    : "text-[#7d8791]"
-                }`}
-              >
-                {p.name}
-              </button>
-            )
-          )}
-        </div>
-
+      <main className="mx-auto w-full max-w-[1000px] px-4 pt-3">
         <form
           onSubmit={addFavorite}
           className="mb-5 rounded-[15px] border border-sand bg-white p-3.5 shadow-sm"
@@ -235,11 +243,12 @@ export default function FavoritesPage() {
             }}
             className="min-h-[60px] w-full resize-y border-0 bg-transparent text-[13px] text-ink outline-none placeholder:text-muted"
           />
-          <input
+          <textarea
             value={shareTitle}
             onChange={(e) => setShareTitle(e.target.value)}
             placeholder="标题（自动识别，可修改）"
-            className="w-full rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
+            rows={2}
+            className="w-full resize-none rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
           />
           {userTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -269,7 +278,7 @@ export default function FavoritesPage() {
             value={shareTags}
             onChange={(e) => setShareTags(e.target.value)}
             placeholder="新建标签（用逗号分隔）"
-            className="w-full rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
+            className="mt-3 w-full rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
           />
           {(() => {
             const last = shareTags.split(/[,，]/).pop()?.trim() ?? "";
@@ -361,6 +370,40 @@ export default function FavoritesPage() {
           )}
         </form>
 
+        <div className="mb-3 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {[{ key: "all", name: "全部" }, ...PLATFORMS].map(
+            (p) => (
+              <button
+                key={p.key}
+                onClick={() => setFilter(p.key)}
+                className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 text-xs ${
+                  filter === p.key
+                    ? "bg-brand text-white"
+                    : "text-[#7d8791]"
+                }`}
+              >
+                {p.name}
+              </button>
+            )
+          )}
+        </div>
+
+        <div className="mb-3 flex h-11 items-center gap-2 rounded-[13px] bg-[#f7f8fa] px-3 text-muted">
+          <Search size={17} strokeWidth={1.8} />
+          <input
+            id="searchbox"
+            placeholder="搜索标题、平台或标签…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full border-0 bg-transparent text-ink outline-none"
+          />
+          {query && (
+            <button onClick={() => setQuery("")} aria-label="清除搜索">
+              <X size={16} />
+            </button>
+          )}
+        </div>
+
         {loading ? (
           <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3">
             {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -393,6 +436,41 @@ export default function FavoritesPage() {
         onClose={() => setActiveFavorite(null)}
         onChanged={load}
       />
+
+      <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="设置">
+        <div className="mb-3 text-sm font-semibold text-ink">主题颜色</div>
+        <div className="flex flex-wrap gap-3">
+          {THEME_COLORS.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => applyThemeColor(c.value)}
+              aria-label={c.name}
+              className="grid h-10 w-10 place-items-center rounded-full"
+              style={{
+                backgroundColor: c.value,
+                outline: themeColor === c.value ? "2px solid #1d2630" : "none",
+                outlineOffset: 2,
+              }}
+            />
+          ))}
+        </div>
+        {userAvatar && (
+          <button
+            onClick={async () => {
+              try {
+                const color = await extractDominantColor(userAvatar);
+                applyThemeColor(color);
+              } catch {
+                // 忽略
+              }
+            }}
+            className="mt-3 flex items-center gap-1.5 rounded-full border border-sand px-3.5 py-2 text-xs text-ink"
+          >
+            <Palette size={14} strokeWidth={1.8} />
+            从头像提取主题色
+          </button>
+        )}
+      </BottomSheet>
 
       <BottomNav />
     </div>

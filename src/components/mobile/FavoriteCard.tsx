@@ -37,12 +37,15 @@ export default function FavoriteCard({
           />
         ) : (
           <div
-            className="flex aspect-[16/10] w-full items-center justify-center bg-brand-soft"
-            style={{ color: platformColor(favorite.platform) }}
+            className="flex aspect-[16/10] w-full items-center justify-center"
+            style={{
+              backgroundColor: platformColor(favorite.platform),
+              color: "#ffffff",
+            }}
           >
             {(() => {
               const Icon = platformIcon(favorite.platform);
-              return <Icon size={64} />;
+              return <Icon size={56} />;
             })()}
           </div>
         )}
