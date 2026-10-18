@@ -37,7 +37,7 @@ export async function createSession(userId: string): Promise<void> {
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.COOKIE_SECURE === "true",
     path: "/",
     maxAge: SESSION_MAX_AGE,
   });
@@ -51,6 +51,9 @@ export async function destroySession(): Promise<void> {
 export async function getSessionUser(): Promise<{
   id: string;
   email: string;
+  name: string | null;
+  avatar: string | null;
+  tags: string[];
   role: string;
 } | null> {
   const cookieStore = await cookies();
@@ -63,7 +66,14 @@ export async function getSessionUser(): Promise<{
     if (!userId) return null;
     return db.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, role: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+        tags: true,
+        role: true,
+      },
     });
   } catch {
     return null;
@@ -74,6 +84,9 @@ export async function getSessionUser(): Promise<{
 export async function requireUser(): Promise<{
   id: string;
   email: string;
+  name: string | null;
+  avatar: string | null;
+  tags: string[];
   role: string;
 }> {
   const user = await getSessionUser();

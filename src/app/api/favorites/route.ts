@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     throw e;
   }
 
-  let body: { text?: string; url?: string; title?: string; tags?: string[] };
+  let body: { text?: string; url?: string; title?: string; tags?: string[]; platform?: string };
   try {
     body = await request.json();
   } catch {
@@ -48,7 +48,8 @@ export async function POST(request: Request) {
 
     const inputUrl = body.url;
     const canonicalUrl = await resolveUrl(inputUrl).catch(() => inputUrl);
-    const platform = matchAdapter(canonicalUrl)?.name ?? "unknown";
+    const platform =
+      body.platform || matchAdapter(canonicalUrl)?.name || "unknown";
     const tags = Array.isArray(body.tags) ? body.tags : [];
 
     const existing = await db.favorite.findUnique({
@@ -147,7 +148,7 @@ export async function POST(request: Request) {
       title: meta.title,
       cover: meta.cover,
       author: meta.author,
-      tags: [],
+      tags: Array.isArray(body.tags) ? body.tags : [],
     },
   });
 
