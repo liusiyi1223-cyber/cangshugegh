@@ -86,8 +86,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-white p-6">
-      <div className="w-full max-w-[400px] rounded-[20px] border border-sand bg-white p-7 shadow-sm">
+    <main className="grid min-h-dvh place-items-center bg-white p-4">
+      <div className="w-full max-w-md rounded-[20px] border border-sand bg-white px-7 py-10 shadow-sm">
         <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-[15px] bg-brand-soft text-brand">
           <Bookmark size={27} strokeWidth={1.8} />
         </div>
@@ -220,7 +220,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-5 w-full rounded-[11px] bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+            className="mt-5 w-full rounded-[11px] border border-brand bg-white py-3 text-[13px] font-semibold text-brand disabled:opacity-55"
           >
             {busy ? "请稍候…" : "登录"}
           </button>
@@ -228,7 +228,7 @@ export default function LoginPage() {
 
         <p className="mt-5 text-center text-[12px] text-muted">
           没有账号？
-          <Link href="/register" className="font-medium text-brand">
+          <Link href="/register" replace className="font-medium text-brand">
             注册
           </Link>
         </p>

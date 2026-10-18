@@ -49,8 +49,8 @@ export default function WelcomePage() {
               className="flex flex-col items-center gap-2"
             >
               <div
-                className="grid h-14 w-14 place-items-center rounded-full"
-                style={{ backgroundColor: platformColor(key), color: "#ffffff" }}
+                className="grid h-14 w-14 place-items-center rounded-full border border-sand shadow-lg"
+                style={{ backgroundColor: "#ffffff", color: platformColor(key) }}
               >
                 <Icon size={24} />
               </div>
@@ -63,7 +63,7 @@ export default function WelcomePage() {
       <div className="mx-auto w-full max-w-sm pb-10">
         <a
           href="/login"
-          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-brand text-[15px] font-semibold text-white"
+          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-brand bg-white text-[15px] font-semibold text-brand"
         >
           登录
         </a>

@@ -225,7 +225,7 @@ export default function RegisterPage() {
 
         <p className="mt-5 text-center text-[12px] text-muted">
           已有账号？
-          <Link href="/login" className="font-medium text-brand">
+          <Link href="/login" replace className="font-medium text-brand">
             登录
           </Link>
         </p>

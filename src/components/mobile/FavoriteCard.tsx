@@ -19,7 +19,7 @@ export default function FavoriteCard({
 
   return (
     <article
-      className={`mb-2.5 break-inside-avoid overflow-hidden rounded-[14px] border border-sand bg-white shadow-sm ${
+      className={`mb-1 break-inside-avoid overflow-hidden rounded-[8px] border border-sand bg-white shadow-sm ${
         broken ? "opacity-60" : ""
       }`}
     >

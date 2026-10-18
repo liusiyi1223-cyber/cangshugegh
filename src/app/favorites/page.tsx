@@ -520,7 +520,7 @@ export default function FavoritesPage() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3">
+          <div className="grid grid-cols-2 gap-1 md:grid-cols-3">
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="aspect-[4/3] animate-pulse rounded-[14px] bg-brand-soft" />
             ))}
@@ -538,7 +538,7 @@ export default function FavoritesPage() {
             </p>
           </div>
         ) : (
-          <div className="flex items-start gap-2.5">
+          <div className="flex items-start gap-1">
             {columns.map((col, ci) => (
               <div key={ci} className="flex min-w-0 flex-1 flex-col">
                 {col.map((f) => (
