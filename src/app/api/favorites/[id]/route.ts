@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser, UnauthorizedError } from "@/lib/auth";
+import { saveDataUrlCover, storeCover } from "@/lib/cover";
 import { db } from "@/lib/db";
 
 export async function PATCH(
@@ -18,7 +19,7 @@ export async function PATCH(
 
   const { id } = await params;
 
-  let body: { tags?: string[]; status?: string; title?: string; collectionIds?: string[] };
+  let body: { tags?: string[]; status?: string; title?: string; collectionIds?: string[]; cover?: string | null };
   try {
     body = await request.json();
   } catch {
@@ -34,6 +35,7 @@ export async function PATCH(
     tags?: string[];
     status?: "ACTIVE" | "BROKEN";
     title?: string;
+    cover?: string | null;
     collections?: { set: { id: string }[] };
   } = {};
 
@@ -46,6 +48,20 @@ export async function PATCH(
   }
   if (body.status === "ACTIVE" || body.status === "BROKEN") {
     data.status = body.status;
+  }
+  if (body.cover === null) {
+    data.cover = null;
+  } else if (typeof body.cover === "string") {
+    const c = body.cover.trim();
+    if (c === "") {
+      data.cover = null;
+    } else if (c.startsWith("data:")) {
+      const local = await saveDataUrlCover(c);
+      if (local) data.cover = local;
+    } else if (c.startsWith("http://") || c.startsWith("https://")) {
+      const stored = await storeCover(c).catch(() => null);
+      if (stored) data.cover = stored;
+    }
   }
   if (Array.isArray(body.collectionIds)) {
     const ids = body.collectionIds.filter(

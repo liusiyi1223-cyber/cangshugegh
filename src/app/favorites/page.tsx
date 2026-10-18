@@ -41,6 +41,7 @@ export default function FavoritesPage() {
   const [showManual, setShowManual] = useState(false);
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
+  const [manualCover, setManualCover] = useState("");
   const [shareTags, setShareTags] = useState("");
   const shareTagsRef = useRef<HTMLTextAreaElement>(null);
   const [sharePlatform, setSharePlatform] = useState("other");
@@ -80,6 +81,17 @@ export default function FavoritesPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get("url");
+    if (!url) return;
+    setManualUrl(url);
+    setManualTitle(params.get("title") ?? "");
+    setManualCover(params.get("cover") ?? "");
+    setShowManual(true);
+    window.history.replaceState(null, "", "/favorites");
+  }, []);
 
   const refreshProfile = useCallback(async () => {
     try {
@@ -218,6 +230,7 @@ export default function FavoritesPage() {
       body: JSON.stringify({
         url,
         title,
+        cover: manualCover || undefined,
         platform: manualPlatform,
         tags: parseTags(shareTags),
       }),

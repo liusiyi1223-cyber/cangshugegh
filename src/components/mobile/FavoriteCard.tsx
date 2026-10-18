@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
-import { platformAppIcon, platformColor, platformIcon, platformName } from "@/lib/platforms";
+import { platformColor, platformIcon, platformName } from "@/lib/platforms";
 import { formatRelativeTime } from "@/lib/time";
 
 export default function FavoriteCard({
@@ -41,20 +41,6 @@ export default function FavoriteCard({
           />
         ) : (
           (() => {
-            const appIcon = platformAppIcon(favorite.platform);
-            if (appIcon) {
-              return (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={appIcon}
-                  alt=""
-                  loading="lazy"
-                  className={`pointer-events-none block aspect-[16/10] w-full object-contain ${
-                    broken ? "grayscale" : ""
-                  }`}
-                />
-              );
-            }
             const Icon = platformIcon(favorite.platform);
             return (
               <div
@@ -64,7 +50,7 @@ export default function FavoriteCard({
                   color: "#ffffff",
                 }}
               >
-                <Icon size={56} />
+                <Icon size={48} className={broken ? "opacity-70" : ""} />
               </div>
             );
           })()

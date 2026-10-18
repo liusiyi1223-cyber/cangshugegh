@@ -28,12 +28,13 @@ export function contentTypeForExt(ext: string): string | undefined {
 // 下载远程封面并存到本地磁盘，返回相对回显路径；任一步失败返回 null（调用方降级保留原 URL）
 export async function storeCover(remoteUrl: string): Promise<string | null> {
   try {
-    const parsed = new URL(remoteUrl);
+    const url = remoteUrl.startsWith("//") ? `https:${remoteUrl}` : remoteUrl;
+    const parsed = new URL(url);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return null;
     }
 
-    const res = await safeFetch(remoteUrl, {
+    const res = await safeFetch(url, {
       allowedDomains: [parsed.hostname],
       accept: "image/*",
       timeoutMs: 5000,
@@ -53,6 +54,24 @@ export async function storeCover(remoteUrl: string): Promise<string | null> {
     const name = `${randomUUID()}${ext}`;
     await writeFile(path.join(COVERS_DIR, name), bytes);
 
+    return `/api/covers/${name}`;
+  } catch {
+    return null;
+  }
+}
+
+// 把 data URL（前端上传的图片）解码并落到本地磁盘，返回回显路径；失败返回 null
+export async function saveDataUrlCover(dataUrl: string): Promise<string | null> {
+  try {
+    const m = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+    if (!m) return null;
+    const ext = EXT_BY_MIME[m[1].toLowerCase()] ?? ".jpg";
+    const bytes = Buffer.from(m[2], "base64");
+    if (bytes.length === 0 || bytes.length > MAX_BYTES) return null;
+
+    await mkdir(COVERS_DIR, { recursive: true });
+    const name = `${randomUUID()}${ext}`;
+    await writeFile(path.join(COVERS_DIR, name), bytes);
     return `/api/covers/${name}`;
   } catch {
     return null;

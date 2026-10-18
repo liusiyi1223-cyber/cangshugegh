@@ -78,7 +78,7 @@ export default function MePage() {
   useEffect(() => {
     loadUser();
     setBookmarklet(
-      `javascript:(function(){location.href='${window.location.origin}/favorites?url='+encodeURIComponent(location.href)})()`
+      `javascript:(function(){var c=document.querySelector('meta[property="og:image"]');var t=document.querySelector('meta[property="og:title"]');location.href='${window.location.origin}/favorites?url='+encodeURIComponent(location.href)+'&cover='+encodeURIComponent(c?c.content:'')+'&title='+encodeURIComponent(t?t.content:(document.title||''))})()`
     );
   }, []);
 

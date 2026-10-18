@@ -9,6 +9,7 @@ import {
   Tag,
   Trash,
 } from "lucide-react";
+import { compressImage } from "@/lib/image";
 import type { FavoriteWithCollections } from "@/lib/types";
 import TagEditSheet from "./TagEditSheet";
 
@@ -67,6 +68,28 @@ export default function FavoriteActionSheet({
     if (res.ok) {
       onChanged();
       onClose();
+    }
+  }
+
+  async function handleCover(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    try {
+      const dataUrl = await compressImage(file, 1000);
+      const res = await fetch(`/api/favorites/${f.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cover: dataUrl }),
+      });
+      if (res.ok) {
+        onChanged();
+        onClose();
+      }
+    } catch {
+      // 上传失败则忽略，保持原封面
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -133,6 +156,17 @@ export default function FavoriteActionSheet({
               <Tag className={iconClass} strokeWidth={1.8} />
               <span>编辑</span>
             </button>
+
+            <label className={rowClass}>
+              <ImageIcon className={iconClass} strokeWidth={1.8} />
+              <span>{f.cover ? "更换封面" : "补封面"}</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleCover}
+                className="hidden"
+              />
+            </label>
 
             <button
               type="button"

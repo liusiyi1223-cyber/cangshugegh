@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     throw e;
   }
 
-  let body: { text?: string; url?: string; title?: string; tags?: string[]; platform?: string };
+  let body: { text?: string; url?: string; title?: string; tags?: string[]; platform?: string; cover?: string };
   try {
     body = await request.json();
   } catch {
@@ -73,14 +73,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ ...existing, alreadyExists: true });
     }
 
-    // 手动模式也尽力抓封面（抓不到就留空，不影响保存）
-    let cover: string | undefined;
-    const adapter = matchAdapter(canonicalUrl);
-    if (adapter) {
-      try {
-        cover = (await adapter.fetchMeta(canonicalUrl)).cover;
-      } catch {
-        // 忽略抓取失败
+    // 优先用客户端传来的封面（书签工具从小红书等页面抓的真实封面）；否则再尽力抓取
+    let cover: string | undefined = body.cover;
+    if (!cover) {
+      const adapter = matchAdapter(canonicalUrl);
+      if (adapter) {
+        try {
+          cover = (await adapter.fetchMeta(canonicalUrl)).cover;
+        } catch {
+          // 忽略抓取失败
+        }
       }
     }
 
