@@ -42,34 +42,47 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-lg border border-gray-200 p-6">
-        <h1 className="mb-4 text-xl font-semibold">互联网总收藏夹</h1>
+      <div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-sm ring-1 ring-sand">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-semibold text-ink">互联网总收藏夹</h1>
+          <p className="mt-1 text-sm text-muted">把分散的收藏，收到一个地方</p>
+        </div>
 
         {me ? (
-          <div>
-            <p className="mb-4">当前登录：{me.email}</p>
+          <div className="text-center">
+            <p className="mb-4 text-sm text-muted">当前登录：{me.email}</p>
+            <a
+              href="/favorites"
+              className="mb-3 block rounded-full bg-brand px-4 py-2 text-sm text-white transition hover:bg-brand-dark"
+            >
+              进入收藏
+            </a>
             <button
               onClick={onLogout}
-              className="rounded bg-gray-800 px-4 py-2 text-white"
+              className="text-sm text-muted hover:text-ink"
             >
               退出登录
             </button>
           </div>
         ) : (
           <>
-            <div className="mb-4 flex gap-2">
+            <div className="mb-5 flex gap-1 rounded-full bg-cream p-1">
               <button
                 onClick={() => setMode("login")}
-                className={`flex-1 rounded px-3 py-2 ${
-                  mode === "login" ? "bg-gray-800 text-white" : "bg-gray-100"
+                className={`flex-1 rounded-full px-3 py-1.5 text-sm transition ${
+                  mode === "login"
+                    ? "bg-white text-ink shadow-sm"
+                    : "text-muted hover:text-ink"
                 }`}
               >
                 登录
               </button>
               <button
                 onClick={() => setMode("register")}
-                className={`flex-1 rounded px-3 py-2 ${
-                  mode === "register" ? "bg-gray-800 text-white" : "bg-gray-100"
+                className={`flex-1 rounded-full px-3 py-1.5 text-sm transition ${
+                  mode === "register"
+                    ? "bg-white text-ink shadow-sm"
+                    : "text-muted hover:text-ink"
                 }`}
               >
                 注册
@@ -83,7 +96,7 @@ export default function LoginPage() {
                 placeholder="邮箱"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2"
+                className="w-full rounded-xl border border-sand bg-cream px-4 py-2.5 text-ink placeholder:text-muted focus:border-brand focus:outline-none"
               />
               <input
                 type="password"
@@ -92,11 +105,11 @@ export default function LoginPage() {
                 placeholder="密码（至少 8 位）"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2"
+                className="w-full rounded-xl border border-sand bg-cream px-4 py-2.5 text-ink placeholder:text-muted focus:border-brand focus:outline-none"
               />
               <button
                 type="submit"
-                className="w-full rounded bg-gray-800 px-4 py-2 text-white"
+                className="w-full rounded-full bg-brand px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-dark"
               >
                 {mode === "login" ? "登录" : "注册"}
               </button>
@@ -104,7 +117,7 @@ export default function LoginPage() {
           </>
         )}
 
-        {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
+        {message && <p className="mt-4 text-center text-sm text-brand">{message}</p>}
       </div>
     </main>
   );
