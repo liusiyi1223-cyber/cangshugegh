@@ -8,6 +8,7 @@ function cleanTitle(raw: string): string {
 
 export const zhihuAdapter: PlatformAdapter = {
   name: "zhihu",
+  domains: ["zhihu.com"],
 
   match(url: string): boolean {
     try {
@@ -19,7 +20,7 @@ export const zhihuAdapter: PlatformAdapter = {
   },
 
   async fetchMeta(url: string): Promise<FetchedMeta> {
-    const html = await fetchHtml(url);
+    const html = await fetchHtml(url, this.domains);
     const $ = load(html);
     const ogTitle = $('meta[property="og:title"]').attr("content");
     const title = cleanTitle(ogTitle || $("title").first().text());

@@ -7,6 +7,7 @@ export interface FetchedMeta {
 
 export interface PlatformAdapter {
   name: string;
+  domains: string[];
   match(url: string): boolean;
   fetchMeta(url: string): Promise<FetchedMeta>;
 }

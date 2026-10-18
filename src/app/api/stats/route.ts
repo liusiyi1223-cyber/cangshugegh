@@ -3,7 +3,7 @@ import { requireUser, UnauthorizedError } from "@/lib/auth";
 import { db } from "@/lib/db";
 
 export async function GET() {
-  let user: { id: string; email: string };
+  let user: { id: string; email: string; role: string };
   try {
     user = await requireUser();
   } catch (e) {
@@ -11,6 +11,10 @@ export async function GET() {
       return NextResponse.json({ error: "未登录" }, { status: 401 });
     }
     throw e;
+  }
+
+  if (user.role !== "ADMIN") {
+    return NextResponse.json({ error: "无权限" }, { status: 403 });
   }
 
   const logs = await db.fetchLog.findMany({

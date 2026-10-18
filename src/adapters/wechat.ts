@@ -4,6 +4,7 @@ import { absolutize, fetchHtml } from "./utils";
 
 export const wechatAdapter: PlatformAdapter = {
   name: "wechat",
+  domains: ["weixin.qq.com"],
 
   match(url: string): boolean {
     try {
@@ -15,7 +16,7 @@ export const wechatAdapter: PlatformAdapter = {
   },
 
   async fetchMeta(url: string): Promise<FetchedMeta> {
-    const html = await fetchHtml(url);
+    const html = await fetchHtml(url, this.domains);
     const $ = load(html);
     const ogTitle = $('meta[property="og:title"]').attr("content");
     const title = (ogTitle || $("title").first().text()).trim();

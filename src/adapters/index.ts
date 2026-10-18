@@ -24,3 +24,5 @@ export const adapters: PlatformAdapter[] = [
 export function matchAdapter(url: string): PlatformAdapter | undefined {
   return adapters.find((adapter) => adapter.match(url));
 }
+
+export const PLATFORM_DOMAINS = [...new Set(adapters.flatMap((a) => a.domains))];

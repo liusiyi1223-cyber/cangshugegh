@@ -51,6 +51,7 @@ export async function destroySession(): Promise<void> {
 export async function getSessionUser(): Promise<{
   id: string;
   email: string;
+  role: string;
 } | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
@@ -62,7 +63,7 @@ export async function getSessionUser(): Promise<{
     if (!userId) return null;
     return db.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true },
+      select: { id: true, email: true, role: true },
     });
   } catch {
     return null;
@@ -70,7 +71,11 @@ export async function getSessionUser(): Promise<{
 }
 
 // 所有需要鉴权的接口都先调它拿 userId，收藏查询一律用这个 userId 过滤，不信任前端传入。
-export async function requireUser(): Promise<{ id: string; email: string }> {
+export async function requireUser(): Promise<{
+  id: string;
+  email: string;
+  role: string;
+}> {
   const user = await getSessionUser();
   if (!user) throw new UnauthorizedError();
   return user;

@@ -8,6 +8,7 @@ function cleanTitle(raw: string): string {
 
 export const weiboAdapter: PlatformAdapter = {
   name: "weibo",
+  domains: ["weibo.com", "weibo.cn"],
 
   match(url: string): boolean {
     try {
@@ -24,7 +25,7 @@ export const weiboAdapter: PlatformAdapter = {
   },
 
   async fetchMeta(url: string): Promise<FetchedMeta> {
-    const html = await fetchHtml(url);
+    const html = await fetchHtml(url, this.domains);
     const $ = load(html);
     const ogTitle = $('meta[property="og:title"]').attr("content");
     const title = cleanTitle(ogTitle || $("title").first().text());

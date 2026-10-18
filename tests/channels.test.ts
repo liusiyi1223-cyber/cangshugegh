@@ -31,7 +31,7 @@ describe("channelsAdapter.fetchMeta", () => {
   it("从 og 标签解析标题/封面/canonicalUrl", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => ({ ok: true, status: 200, text: async () => pageHtml }))
+      vi.fn(async () => new Response(pageHtml, { status: 200 }))
     );
 
     const meta = await channelsAdapter.fetchMeta("https://channels.weixin.qq.com/AbCdEf");
@@ -44,7 +44,7 @@ describe("channelsAdapter.fetchMeta", () => {
   it("非 2xx 响应抛错", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => ({ ok: false, status: 403, text: async () => "" }))
+      vi.fn(async () => new Response("", { status: 403 }))
     );
 
     await expect(
