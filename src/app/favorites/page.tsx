@@ -27,6 +27,7 @@ export default function FavoritesPage() {
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
   const [shareTags, setShareTags] = useState("");
+  const [sharePlatform, setSharePlatform] = useState("auto");
   const [userTags, setUserTags] = useState<string[]>([]);
   const [manualPlatform, setManualPlatform] = useState("bilibili");
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
@@ -100,7 +101,11 @@ export default function FavoritesPage() {
     const res = await fetch("/api/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, tags: parseTags(shareTags) }),
+      body: JSON.stringify({
+        text,
+        tags: parseTags(shareTags),
+        platform: sharePlatform === "auto" ? undefined : sharePlatform,
+      }),
     });
     const data = await res.json().catch(() => ({}));
     setBusy(false);
@@ -289,7 +294,18 @@ export default function FavoritesPage() {
             );
           })()}
           <div className="mt-2 flex items-center justify-between gap-2.5">
-            <span className="text-[11px] text-muted">支持 9 个内容平台</span>
+            <select
+              value={sharePlatform}
+              onChange={(e) => setSharePlatform(e.target.value)}
+              className="rounded-[11px] border border-sand bg-white px-2.5 py-2 text-[13px] text-ink outline-none"
+            >
+              <option value="auto">自动识别平台</option>
+              {PLATFORMS.map((p) => (
+                <option key={p.key} value={p.key}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
             <button
               type="submit"
               disabled={!shareText.trim() || busy}

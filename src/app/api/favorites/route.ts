@@ -84,6 +84,39 @@ export async function POST(request: Request) {
   }
 
   const inputUrl = urls[0];
+  const textTitle = extractTitle(text);
+  const tags = Array.isArray(body.tags) ? body.tags : [];
+
+  async function save(
+    url: string,
+    canonicalUrl: string,
+    platform: string,
+    title: string,
+    cover?: string,
+    author?: string
+  ) {
+    const existing = await db.favorite.findUnique({
+      where: {
+        userId_canonicalUrl: { userId: user.id, canonicalUrl },
+      },
+    });
+    if (existing) {
+      return NextResponse.json({ ...existing, alreadyExists: true });
+    }
+    const favorite = await db.favorite.create({
+      data: {
+        userId: user.id,
+        url,
+        canonicalUrl,
+        platform,
+        title,
+        cover,
+        author,
+        tags,
+      },
+    });
+    return NextResponse.json(favorite, { status: 201 });
+  }
 
   let resolved: string;
   try {
@@ -95,6 +128,9 @@ export async function POST(request: Request) {
       success: false,
       error: "短链还原失败",
     });
+    if (textTitle) {
+      return save(inputUrl, inputUrl, "unknown", textTitle);
+    }
     return NextResponse.json(
       { error: "抓取失败，请手动补标题", url: inputUrl },
       { status: 422 }
@@ -102,6 +138,7 @@ export async function POST(request: Request) {
   }
 
   const adapter = matchAdapter(resolved);
+  const platform = body.platform || adapter?.name || "unknown";
   if (!adapter) {
     await logFetch({
       platform: null,
@@ -109,6 +146,9 @@ export async function POST(request: Request) {
       success: false,
       error: "暂不支持该平台",
     });
+    if (textTitle || body.platform) {
+      return save(inputUrl, resolved, platform, textTitle);
+    }
     return NextResponse.json({ error: "暂不支持该平台" }, { status: 422 });
   }
 
@@ -117,43 +157,30 @@ export async function POST(request: Request) {
     meta = await adapter.fetchMeta(resolved);
   } catch (err) {
     await logFetch({
-      platform: adapter.name,
+      platform,
       url: inputUrl,
       success: false,
       error: err instanceof Error ? err.message : "未知错误",
     });
+    if (textTitle) {
+      return save(resolved, resolved, platform, textTitle);
+    }
     return NextResponse.json(
       { error: "抓取失败，请手动补标题", url: inputUrl },
       { status: 422 }
     );
   }
 
-  await logFetch({ platform: adapter.name, url: inputUrl, success: true });
+  await logFetch({ platform, url: inputUrl, success: true });
 
-  const existing = await db.favorite.findUnique({
-    where: {
-      userId_canonicalUrl: { userId: user.id, canonicalUrl: meta.canonicalUrl },
-    },
-  });
-  if (existing) {
-    return NextResponse.json({ ...existing, alreadyExists: true });
-  }
-
-  const textTitle = extractTitle(text);
-  const favorite = await db.favorite.create({
-    data: {
-      userId: user.id,
-      url: meta.canonicalUrl,
-      canonicalUrl: meta.canonicalUrl,
-      platform: adapter.name,
-      title: textTitle || meta.title,
-      cover: meta.cover,
-      author: meta.author,
-      tags: Array.isArray(body.tags) ? body.tags : [],
-    },
-  });
-
-  return NextResponse.json(favorite, { status: 201 });
+  return save(
+    meta.canonicalUrl,
+    meta.canonicalUrl,
+    platform,
+    textTitle || meta.title,
+    meta.cover,
+    meta.author
+  );
 }
 
 export async function GET(request: Request) {

@@ -8,6 +8,7 @@ export const PLATFORMS = [
   { key: "wechat", name: "微信公众号" },
   { key: "channels", name: "微信视频号" },
   { key: "youtube", name: "YouTube" },
+  { key: "other", name: "其他" },
 ];
 
 export function platformName(key?: string | null): string {
