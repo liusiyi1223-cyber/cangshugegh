@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
-import { platformColor, platformIcon, platformName } from "@/lib/platforms";
+import { platformAppIcon, platformColor, platformIcon, platformName } from "@/lib/platforms";
+import { formatRelativeTime } from "@/lib/time";
 
 export default function FavoriteCard({
   favorite,
@@ -13,6 +15,7 @@ export default function FavoriteCard({
 }) {
   const broken = favorite.status === "BROKEN";
   const tags = favorite.tags ?? [];
+  const [coverError, setCoverError] = useState(false);
 
   return (
     <article
@@ -26,28 +29,45 @@ export default function FavoriteCard({
         rel="noreferrer"
         className="relative block overflow-hidden bg-brand-soft"
       >
-        {favorite.cover ? (
+        {favorite.cover && !coverError ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={favorite.cover}
             alt=""
             loading="lazy"
             referrerPolicy="no-referrer"
+            onError={() => setCoverError(true)}
             className={`block h-auto w-full ${broken ? "grayscale" : ""}`}
           />
         ) : (
-          <div
-            className="flex aspect-[16/10] w-full items-center justify-center"
-            style={{
-              backgroundColor: platformColor(favorite.platform),
-              color: "#ffffff",
-            }}
-          >
-            {(() => {
-              const Icon = platformIcon(favorite.platform);
-              return <Icon size={56} />;
-            })()}
-          </div>
+          (() => {
+            const appIcon = platformAppIcon(favorite.platform);
+            if (appIcon) {
+              return (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={appIcon}
+                  alt=""
+                  loading="lazy"
+                  className={`pointer-events-none block aspect-[16/10] w-full object-contain ${
+                    broken ? "grayscale" : ""
+                  }`}
+                />
+              );
+            }
+            const Icon = platformIcon(favorite.platform);
+            return (
+              <div
+                className="flex aspect-[16/10] w-full items-center justify-center"
+                style={{
+                  backgroundColor: platformColor(favorite.platform),
+                  color: "#ffffff",
+                }}
+              >
+                <Icon size={56} />
+              </div>
+            );
+          })()
         )}
         {broken && (
           <span className="absolute left-2 top-2 rounded-md bg-white px-1.5 py-0.5 text-[10px] text-muted">
@@ -57,16 +77,24 @@ export default function FavoriteCard({
       </a>
 
       <div className="p-3">
-        <a
-          href={favorite.url}
-          target="_blank"
-          rel="noreferrer"
-          className={`line-clamp-3 text-[13px] font-semibold leading-snug text-ink ${
-            broken ? "line-through" : ""
-          }`}
-        >
-          {favorite.title || "未命名收藏"}
-        </a>
+        <div className="text-[13px] font-semibold leading-snug text-ink">
+          <a
+            href={favorite.url}
+            target="_blank"
+            rel="noreferrer"
+            className={broken ? "line-through" : ""}
+          >
+            {favorite.title || "未命名收藏"}
+          </a>
+          <button
+            type="button"
+            onClick={() => onOpen(favorite)}
+            aria-label="更多操作"
+            className="float-right ml-2 text-ink"
+          >
+            <MoreHorizontal size={18} strokeWidth={2} />
+          </button>
+        </div>
 
         {favorite.author && (
           <div className="mt-1 truncate text-[10px] text-muted">
@@ -74,28 +102,28 @@ export default function FavoriteCard({
           </div>
         )}
 
-        <div className="mt-2.5 flex items-center gap-1.5 border-t border-[#f0f2f4] pt-2">
-          {favorite.platform && (
-            <span className="shrink-0 rounded bg-brand-soft px-1.5 py-0.5 text-[10px] text-brand">
-              {platformName(favorite.platform)}
-            </span>
-          )}
-          {tags.slice(0, 2).map((t) => (
-            <span
-              key={t}
-              className="shrink-0 rounded bg-tag px-1.5 py-0.5 text-[10px] text-[#697681]"
+        <div className="mt-2.5 border-t border-[#f0f2f4] pt-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {favorite.platform && (
+              <span className="shrink-0 rounded bg-brand-soft px-1.5 py-0.5 text-[10px] text-brand">
+                {platformName(favorite.platform)}
+              </span>
+            )}
+            {tags.map((t) => (
+              <span
+                key={t}
+                className="shrink-0 rounded bg-brand-soft px-1.5 py-0.5 text-[10px] text-brand-dark"
+              >
+                #{t}
+              </span>
+            ))}
+            <time
+              title={new Date(favorite.createdAt).toLocaleString()}
+              className="ml-auto shrink-0 text-[10px] text-muted"
             >
-              #{t}
-            </span>
-          ))}
-          <button
-            type="button"
-            onClick={() => onOpen(favorite)}
-            aria-label="更多操作"
-            className="ml-auto shrink-0 text-muted"
-          >
-            <MoreHorizontal size={18} strokeWidth={2} />
-          </button>
+              {formatRelativeTime(favorite.createdAt)}
+            </time>
+          </div>
         </div>
       </div>
     </article>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Plus, Tag as TagIcon, X } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
+import { darken, mixWhite } from "@/lib/color";
 import BottomNav from "@/components/mobile/BottomNav";
 import BottomSheet from "@/components/mobile/BottomSheet";
 import FavoriteActionSheet from "@/components/mobile/FavoriteActionSheet";
@@ -16,6 +17,7 @@ export default function TagsPage() {
   const [newTagName, setNewTagName] = useState("");
   const [activeFavorite, setActiveFavorite] =
     useState<FavoriteWithCollections | null>(null);
+  const [themeColor, setThemeColor] = useState("#243342");
 
   const load = useCallback(async () => {
     const [fr, ur] = await Promise.all([
@@ -29,6 +31,11 @@ export default function TagsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("themeColor");
+    if (saved) setThemeColor(saved);
+  }, []);
 
   const tagCounts = new Map<string, number>();
   for (const f of favorites) {
@@ -64,11 +71,23 @@ export default function TagsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tags: next }),
     });
-    if (res.ok) setUserTags(next);
+    if (res.ok) {
+      setUserTags(next);
+      await load();
+    }
   }
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-white pb-[90px]">
+    <div
+      className="mx-auto min-h-dvh w-full max-w-[1000px] bg-white pb-[90px]"
+      style={
+        {
+          "--color-brand": themeColor,
+          "--color-brand-soft": mixWhite(themeColor, 0.9),
+          "--color-brand-dark": darken(themeColor, 0.15),
+        } as React.CSSProperties
+      }
+    >
       {selectedTag ? (
         <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-sand bg-white px-4 py-3">
           <button
@@ -130,7 +149,7 @@ export default function TagsPage() {
                   onClick={() => setSelectedTag(tag)}
                   className="inline-flex items-center gap-1.5"
                 >
-                  <TagIcon size={14} strokeWidth={1.8} />
+                  <TagIcon size={14} strokeWidth={1.8} className="text-brand" />
                   {tag}
                   <span className="text-[11px] text-muted">
                     {tagCounts.get(tag) ?? 0}

@@ -23,6 +23,7 @@ export default function FavoriteActionSheet({
 }) {
   const [busy, setBusy] = useState(false);
   const [tagOpen, setTagOpen] = useState(false);
+  const [coverError, setCoverError] = useState(false);
 
   useEffect(() => {
     if (!favorite) return;
@@ -32,6 +33,10 @@ export default function FavoriteActionSheet({
       document.body.style.overflow = prev;
     };
   }, [favorite]);
+
+  useEffect(() => {
+    setCoverError(false);
+  }, [favorite?.id]);
 
   if (!favorite) return null;
 
@@ -84,12 +89,13 @@ export default function FavoriteActionSheet({
 
           <div className="flex gap-3 px-4 pb-3 pt-3">
             <div className="h-[54px] w-[96px] shrink-0 overflow-hidden rounded-lg bg-brand-soft">
-              {f.cover ? (
+              {f.cover && !coverError ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={f.cover}
                   alt=""
                   referrerPolicy="no-referrer"
+                  onError={() => setCoverError(true)}
                   className="h-full w-full object-cover"
                 />
               ) : (

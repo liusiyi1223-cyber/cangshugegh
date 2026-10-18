@@ -48,7 +48,27 @@ export async function PATCH(request: Request) {
     data.avatar = body.avatar || null;
   }
   if (Array.isArray(body.tags)) {
-    data.tags = body.tags.filter((t): t is string => typeof t === "string");
+    const newTags = body.tags.filter((t): t is string => typeof t === "string");
+    data.tags = newTags;
+
+    // 删除标签时，级联把该标签从所有收藏里移除（收藏本身保留）
+    const oldUser = await db.user.findUnique({
+      where: { id: user.id },
+      select: { tags: true },
+    });
+    const removed = (oldUser?.tags ?? []).filter((t) => !newTags.includes(t));
+    for (const tag of removed) {
+      const favs = await db.favorite.findMany({
+        where: { userId: user.id, tags: { has: tag } },
+        select: { id: true, tags: true },
+      });
+      for (const fav of favs) {
+        await db.favorite.update({
+          where: { id: fav.id },
+          data: { tags: fav.tags.filter((t) => t !== tag) },
+        });
+      }
+    }
   }
 
   if (Object.keys(data).length === 0) {

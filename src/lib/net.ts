@@ -104,6 +104,7 @@ export interface SafeFetchOptions {
   maxBytes?: number;
   maxRedirects?: number;
   timeoutMs?: number;
+  accept?: string;
 }
 
 function assertSafeUrl(url: string, allowedDomains: string[]): URL {
@@ -141,7 +142,7 @@ export async function safeFetch(
       const res = await fetch(current, {
         redirect: "manual",
         signal: controller.signal,
-        headers: { "user-agent": UA, accept: "text/html" },
+        headers: { "user-agent": UA, accept: options.accept ?? "text/html" },
         dispatcher: getAgent(),
       } as RequestInit & { dispatcher: Agent });
 
@@ -184,4 +185,31 @@ export async function readBodyLimited(
     offset += c.byteLength;
   }
   return new TextDecoder().decode(merged);
+}
+
+export async function readBodyLimitedBuffer(
+  res: Response,
+  maxBytes: number
+): Promise<Uint8Array> {
+  if (!res.body) return new Uint8Array(0);
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel();
+      throw new Error(`响应体超过大小上限 ${maxBytes} 字节`);
+    }
+    chunks.push(value);
+  }
+  const merged = new Uint8Array(total);
+  let offset = 0;
+  for (const c of chunks) {
+    merged.set(c, offset);
+    offset += c.byteLength;
+  }
+  return merged;
 }

@@ -24,7 +24,10 @@ export function compressImage(file: File, maxSize = 200): Promise<string> {
   });
 }
 
-export function extractDominantColor(imgSrc: string): Promise<string> {
+export function extractDominantColors(
+  imgSrc: string,
+  count = 2
+): Promise<string[]> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -51,23 +54,14 @@ export function extractDominantColor(imgSrc: string): Promise<string> {
         counts.set(key, (counts.get(key) ?? 0) + 1);
       }
 
-      let maxKey = "";
-      let maxCount = 0;
-      for (const [key, count] of counts) {
-        if (count > maxCount) {
-          maxCount = count;
-          maxKey = key;
-        }
-      }
-
-      if (!maxKey) {
-        reject(new Error("无法提取颜色"));
-        return;
-      }
-
-      const [r, g, b] = maxKey.split(",").map(Number);
+      const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
       const toHex = (v: number) => (v * 32 + 16).toString(16).padStart(2, "0");
-      resolve(`#${toHex(r)}${toHex(g)}${toHex(b)}`);
+      const colors = sorted.slice(0, count).map(([key]) => {
+        const [r, g, b] = key.split(",").map(Number);
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      });
+
+      resolve(colors);
     };
     img.onerror = () => reject(new Error("图片加载失败"));
     img.src = imgSrc;

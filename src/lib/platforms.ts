@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import {
+  SiBaidu,
   SiBilibili,
   SiInstagram,
   SiSinaweibo,
@@ -35,6 +36,7 @@ type IconType = ComponentType<{ size?: number | string; className?: string }>;
 
 const platformIcons: Record<string, IconType> = {
   bilibili: SiBilibili,
+  baidu: SiBaidu,
   zhihu: SiZhihu,
   xiaohongshu: SiXiaohongshu,
   douyin: SiTiktok,
@@ -51,6 +53,7 @@ export function platformIcon(key?: string | null): IconType {
 
 const platformColors: Record<string, string> = {
   bilibili: "#FB7299",
+  baidu: "#2932E1",
   zhihu: "#0084FF",
   xiaohongshu: "#FF2442",
   douyin: "#000000",
@@ -63,4 +66,22 @@ const platformColors: Record<string, string> = {
 
 export function platformColor(key?: string | null): string {
   return platformColors[key ?? ""] ?? "#647584";
+}
+
+const appIcons: Record<string, string> = {
+  bilibili: "/icons/bilibili.png",
+  zhihu: "/icons/zhihu.jpg",
+  xiaohongshu: "/icons/xiaohongshu.jpg",
+  douyin: "/icons/douyin.jpg",
+  weibo: "/icons/weibo.jpg",
+  baidu: "/icons/baidu.jpg",
+  wechat: "/icons/wechat.jpg",
+  channels: "/icons/wechat.jpg",
+  youtube: "/icons/youtube.jpg",
+  instagram: "/icons/instagram.jpg",
+  x: "/icons/x.jpg",
+};
+
+export function platformAppIcon(key?: string | null): string | undefined {
+  return appIcons[key ?? ""];
 }

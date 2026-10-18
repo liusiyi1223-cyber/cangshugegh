@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bookmark, Menu, Palette, Search, UserRound, X } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
 import { PLATFORMS } from "@/lib/platforms";
 import { extractTitle } from "@/lib/extract";
-import { extractDominantColor } from "@/lib/image";
+import { extractDominantColors } from "@/lib/image";
+import { darken, mixWhite } from "@/lib/color";
 import BottomNav from "@/components/mobile/BottomNav";
 import FavoriteActionSheet from "@/components/mobile/FavoriteActionSheet";
 import BottomSheet from "@/components/mobile/BottomSheet";
@@ -41,12 +42,15 @@ export default function FavoritesPage() {
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
   const [shareTags, setShareTags] = useState("");
+  const shareTagsRef = useRef<HTMLTextAreaElement>(null);
   const [sharePlatform, setSharePlatform] = useState("other");
   const [userTags, setUserTags] = useState<string[]>([]);
   const [userName, setUserName] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [themeColor, setThemeColor] = useState("#243342");
+  const [avatarColors, setAvatarColors] = useState<string[]>([]);
+  const [colCount, setColCount] = useState(2);
   const [manualPlatform, setManualPlatform] = useState("bilibili");
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
     null
@@ -57,7 +61,7 @@ export default function FavoritesPage() {
     setError("");
     const [fr, ur] = await Promise.all([
       fetch("/api/favorites", { cache: "no-store" }),
-      fetch("/api/auth/me"),
+      fetch("/api/auth/me", { cache: "no-store" }),
     ]);
     if (fr.status === 401) {
       window.location.href = "/login";
@@ -77,17 +81,40 @@ export default function FavoritesPage() {
     load();
   }, [load]);
 
+  const refreshProfile = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      if (res.ok) {
+        const u = await res.json();
+        setUserTags(u.tags ?? []);
+        setUserName(u.name ?? "");
+        setUserAvatar(u.avatar ?? "");
+      }
+    } catch {
+      // 静默失败，不打扰用户
+    }
+  }, []);
+
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) refreshProfile();
+    };
+    const onFocus = () => refreshProfile();
+    window.addEventListener("pageshow", onShow);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("pageshow", onShow);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [refreshProfile]);
+
   useEffect(() => {
     const saved = localStorage.getItem("themeColor");
-    if (saved) {
-      setThemeColor(saved);
-      document.documentElement.style.setProperty("--color-brand", saved);
-    }
+    if (saved) setThemeColor(saved);
   }, []);
 
   function applyThemeColor(value: string) {
     setThemeColor(value);
-    document.documentElement.style.setProperty("--color-brand", value);
     localStorage.setItem("themeColor", value);
   }
 
@@ -104,6 +131,23 @@ export default function FavoritesPage() {
       return matches && platformMatch;
     });
   }, [items, query, filter]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const update = () => setColCount(mq.matches ? 3 : 2);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const columns = useMemo(() => {
+    const cols: FavoriteWithCollections[][] = Array.from(
+      { length: colCount },
+      () => []
+    );
+    filtered.forEach((f, i) => cols[i % colCount].push(f));
+    return cols;
+  }, [filtered, colCount]);
 
   async function syncNewTags(tagsInput: string) {
     const newTags = parseTags(tagsInput).filter((t) => !userTags.includes(t));
@@ -195,12 +239,21 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-white pb-[90px]">
+    <div
+      className="min-h-dvh bg-white pb-[90px]"
+      style={
+        {
+          "--color-brand": themeColor,
+          "--color-brand-soft": mixWhite(themeColor, 0.9),
+          "--color-brand-dark": darken(themeColor, 0.15),
+        } as React.CSSProperties
+      }
+    >
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-sand bg-white px-4">
         <button
           onClick={() => setMenuOpen(true)}
           aria-label="菜单"
-          className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-[#65717c]"
+          className="grid h-[38px] w-[38px] place-items-center rounded-xl border border-sand bg-white text-brand"
         >
           <Menu size={20} strokeWidth={1.8} />
         </button>
@@ -231,28 +284,52 @@ export default function FavoritesPage() {
             <Bookmark size={16} className="text-brand" strokeWidth={2} />
             粘贴分享文本，快速收藏
           </div>
-          <textarea
-            id="share-text"
-            aria-label="平台分享文本"
-            placeholder="粘贴来自 B 站、小红书、抖音等平台的分享文本…"
-            value={shareText}
-            onChange={(e) => {
-              setShareText(e.target.value);
-              const t = extractTitle(e.target.value);
-              if (t) setShareTitle(t);
-            }}
-            className="min-h-[60px] w-full resize-y border-0 bg-transparent text-[13px] text-ink outline-none placeholder:text-muted"
-          />
-          <textarea
-            value={shareTitle}
-            onChange={(e) => setShareTitle(e.target.value)}
-            placeholder="标题（自动识别，可修改）"
-            rows={2}
-            className="w-full resize-none rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
-          />
+          <div className="relative">
+            <textarea
+              id="share-text"
+              aria-label="平台分享文本"
+              placeholder="粘贴来自 B 站、小红书、抖音等平台的分享文本…"
+              value={shareText}
+              onChange={(e) => {
+                setShareText(e.target.value);
+                const t = extractTitle(e.target.value);
+                if (t) setShareTitle(t);
+              }}
+              className="min-h-[60px] w-full resize-y border-0 bg-transparent pr-8 text-[13px] text-ink outline-none placeholder:text-muted"
+            />
+            {shareText && (
+              <button
+                type="button"
+                onClick={() => setShareText("")}
+                aria-label="清空"
+                className="absolute right-0 top-2 text-muted"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <textarea
+              value={shareTitle}
+              onChange={(e) => setShareTitle(e.target.value)}
+              placeholder="标题（自动识别，可修改）"
+              rows={4}
+              className="w-full resize-none rounded-[11px] border border-sand bg-white px-3 py-2.5 pr-9 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+            />
+            {shareTitle && (
+              <button
+                type="button"
+                onClick={() => setShareTitle("")}
+                aria-label="清空"
+                className="absolute right-2.5 top-2.5 text-muted"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
           {userTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {userTags.slice(0, 8).map((tag) => {
+              {userTags.map((tag) => {
                 const selected = shareTags
                   .split(/[,，]/)
                   .map((t) => t.trim())
@@ -274,12 +351,35 @@ export default function FavoritesPage() {
               })}
             </div>
           )}
-          <input
-            value={shareTags}
-            onChange={(e) => setShareTags(e.target.value)}
-            placeholder="新建标签（用逗号分隔）"
-            className="mt-3 w-full rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
-          />
+          <div className="relative mt-3">
+            <textarea
+              ref={shareTagsRef}
+              value={shareTags}
+              onChange={(e) => {
+                setShareTags(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = `${e.target.scrollHeight}px`;
+              }}
+              placeholder="新建标签（用逗号分隔）"
+              rows={2}
+              className="w-full resize-none overflow-hidden rounded-[11px] border border-sand bg-white px-3 py-2.5 pr-9 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+            />
+            {shareTags && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShareTags("");
+                  if (shareTagsRef.current) {
+                    shareTagsRef.current.style.height = "auto";
+                  }
+                }}
+                aria-label="清空标签"
+                className="absolute right-2.5 top-2.5 text-muted"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
           {(() => {
             const last = shareTags.split(/[,，]/).pop()?.trim() ?? "";
             const selected = parseTags(shareTags);
@@ -298,7 +398,7 @@ export default function FavoritesPage() {
                       parts[parts.length - 1] = t;
                       setShareTags(parts.join(", "));
                     }}
-                    className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-[#697681]"
+                    className="rounded-full bg-brand-soft px-2.5 py-1 text-[12px] text-brand-dark"
                   >
                     {t}
                   </button>
@@ -312,7 +412,7 @@ export default function FavoritesPage() {
               <select
                 value={sharePlatform}
                 onChange={(e) => setSharePlatform(e.target.value)}
-                className="rounded-[11px] border border-sand bg-white px-2.5 py-2 text-[13px] text-ink outline-none"
+                className="rounded-[11px] border border-sand bg-white px-2.5 py-2 text-[13px] text-ink outline-none focus:border-brand"
               >
                 {PLATFORMS.map((p) => (
                   <option key={p.key} value={p.key}>
@@ -388,11 +488,13 @@ export default function FavoritesPage() {
           )}
         </div>
 
-        <div className="mb-3 flex h-11 items-center gap-2 rounded-[13px] bg-[#f7f8fa] px-3 text-muted">
+        <div className="mb-3 flex h-11 items-center gap-2 rounded-[13px] bg-[#f7f8fa] px-3 text-muted focus-within:ring-1 focus-within:ring-brand">
           <Search size={17} strokeWidth={1.8} />
           <input
             id="searchbox"
-            placeholder="搜索标题、平台或标签…"
+            placeholder={
+              filter === "all" ? "搜索标题、平台或标签…" : "搜索标题或标签…"
+            }
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full border-0 bg-transparent text-ink outline-none"
@@ -423,9 +525,13 @@ export default function FavoritesPage() {
             </p>
           </div>
         ) : (
-          <div className="columns-2 gap-2.5 md:columns-3">
-            {filtered.map((f) => (
-              <FavoriteCard key={f.id} favorite={f} onOpen={setActiveFavorite} />
+          <div className="flex items-start gap-2.5">
+            {columns.map((col, ci) => (
+              <div key={ci} className="flex min-w-0 flex-1 flex-col">
+                {col.map((f) => (
+                  <FavoriteCard key={f.id} favorite={f} onOpen={setActiveFavorite} />
+                ))}
+              </div>
             ))}
           </div>
         )}
@@ -455,20 +561,41 @@ export default function FavoritesPage() {
           ))}
         </div>
         {userAvatar && (
-          <button
-            onClick={async () => {
-              try {
-                const color = await extractDominantColor(userAvatar);
-                applyThemeColor(color);
-              } catch {
-                // 忽略
-              }
-            }}
-            className="mt-3 flex items-center gap-1.5 rounded-full border border-sand px-3.5 py-2 text-xs text-ink"
-          >
-            <Palette size={14} strokeWidth={1.8} />
-            从头像提取主题色
-          </button>
+          <div>
+            <button
+              onClick={async () => {
+                try {
+                  const colors = await extractDominantColors(userAvatar, 3);
+                  setAvatarColors(colors);
+                  if (colors[0]) applyThemeColor(colors[0]);
+                } catch {
+                  // 忽略
+                }
+              }}
+              className="mt-3 flex items-center gap-1.5 rounded-full border border-sand px-3.5 py-2 text-xs text-ink"
+            >
+              <Palette size={14} strokeWidth={1.8} />
+              从头像提取主题色
+            </button>
+            {avatarColors.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {avatarColors.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => applyThemeColor(c)}
+                    aria-label={`颜色 ${c}`}
+                    className="grid h-8 w-8 place-items-center rounded-full"
+                    style={{
+                      backgroundColor: c,
+                      outline:
+                        themeColor === c ? "2px solid #1d2630" : "none",
+                      outlineOffset: 2,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </BottomSheet>
 

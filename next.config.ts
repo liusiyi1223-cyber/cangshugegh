@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // 允许手机通过局域网 IP 访问 dev 服务器（否则 Next 16 会屏蔽其前端 JS，导致页面无交互）
+  allowedDevOrigins: ["192.168.1.7"],
+  experimental: {
+    cpus: 2,
+  },
   turbopack: {
     rules: {
       "*.css": {

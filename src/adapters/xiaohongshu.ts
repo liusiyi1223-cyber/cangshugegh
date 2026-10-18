@@ -11,12 +11,19 @@ function cleanTitle(raw: string): string {
 
 export const xiaohongshuAdapter: PlatformAdapter = {
   name: "xiaohongshu",
-  domains: ["xiaohongshu.com"],
+  domains: ["xiaohongshu.com", "xhslink.com", "xhslink.cn"],
 
   match(url: string): boolean {
     try {
       const host = new URL(url).hostname;
-      return host === "xiaohongshu.com" || host.endsWith(".xiaohongshu.com");
+      return (
+        host === "xiaohongshu.com" ||
+        host.endsWith(".xiaohongshu.com") ||
+        host === "xhslink.com" ||
+        host.endsWith(".xhslink.com") ||
+        host === "xhslink.cn" ||
+        host.endsWith(".xhslink.cn")
+      );
     } catch {
       return false;
     }

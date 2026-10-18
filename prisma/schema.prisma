@@ -52,6 +52,13 @@ model FetchLog {
   createdAt DateTime @default(now())
 }
 
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?
+  content   String
+  createdAt DateTime @default(now())
+}
+
 model Collection {
   id        String     @id @default(cuid())
   userId    String

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { matchAdapter } from "@/adapters";
 import type { FetchedMeta } from "@/adapters/types";
 import { requireUser, UnauthorizedError } from "@/lib/auth";
+import { storeCover } from "@/lib/cover";
 import { db } from "@/lib/db";
 import { extractTitle, extractUrls } from "@/lib/extract";
 import { resolveUrl } from "@/lib/resolve";
@@ -19,6 +20,19 @@ async function logFetch(entry: FetchLogEntry) {
   } catch {
     // 日志失败不阻断主流程
   }
+}
+
+// 前端默认传 "other" 表示「未指定」，此时优先用链接自动识别的平台
+function resolvePlatform(userPlatform?: string, detected?: string): string {
+  if (userPlatform && userPlatform !== "other") return userPlatform;
+  return detected || "unknown";
+}
+
+// 下载封面转存到本地磁盘；失败则降级保留原远程 URL
+async function persistCover(cover?: string): Promise<string | undefined> {
+  if (!cover) return undefined;
+  const stored = await storeCover(cover).catch(() => null);
+  return stored ?? cover;
 }
 
 export async function POST(request: Request) {
@@ -59,6 +73,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ ...existing, alreadyExists: true });
     }
 
+    // 手动模式也尽力抓封面（抓不到就留空，不影响保存）
+    let cover: string | undefined;
+    const adapter = matchAdapter(canonicalUrl);
+    if (adapter) {
+      try {
+        cover = (await adapter.fetchMeta(canonicalUrl)).cover;
+      } catch {
+        // 忽略抓取失败
+      }
+    }
+
     const favorite = await db.favorite.create({
       data: {
         userId: user.id,
@@ -66,6 +91,7 @@ export async function POST(request: Request) {
         canonicalUrl,
         platform,
         title,
+        cover: await persistCover(cover),
         tags,
       },
     });
@@ -110,7 +136,7 @@ export async function POST(request: Request) {
         canonicalUrl,
         platform,
         title,
-        cover,
+        cover: await persistCover(cover),
         author,
         tags,
       },
@@ -130,7 +156,7 @@ export async function POST(request: Request) {
         return save(
           inputUrl,
           fallbackMeta.canonicalUrl,
-          body.platform || fallbackAdapter.name,
+          resolvePlatform(body.platform, fallbackAdapter.name),
           body.title || textTitle || fallbackMeta.title,
           fallbackMeta.cover,
           fallbackMeta.author
@@ -148,13 +174,13 @@ export async function POST(request: Request) {
     return save(
       inputUrl,
       inputUrl,
-      body.platform || "unknown",
+      resolvePlatform(body.platform, fallbackAdapter?.name),
       body.title || textTitle || "未命名收藏"
     );
   }
 
   const adapter = matchAdapter(resolved);
-  const platform = body.platform || adapter?.name || "unknown";
+  const platform = resolvePlatform(body.platform, adapter?.name);
   if (!adapter) {
     await logFetch({
       platform: null,

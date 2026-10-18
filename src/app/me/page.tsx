@@ -8,6 +8,7 @@ import {
   Bookmark,
   ChevronRight,
   LogOut,
+  MessageSquare,
   Trash,
   User as UserIcon,
 } from "lucide-react";
@@ -63,6 +64,11 @@ export default function MePage() {
   const [showBookmarklet, setShowBookmarklet] = useState(false);
   const [bookmarklet, setBookmarklet] = useState("");
   const [copied, setCopied] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackBusy, setFeedbackBusy] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
 
   const loadUser = async () => {
     const res = await fetch("/api/auth/me");
@@ -129,6 +135,25 @@ export default function MePage() {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // 剪贴板不可用
+    }
+  }
+
+  async function submitFeedback() {
+    if (!feedbackText.trim() || feedbackBusy) return;
+    setFeedbackBusy(true);
+    setFeedbackError("");
+    const res = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: feedbackText }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setFeedbackBusy(false);
+    if (res.ok) {
+      setFeedbackSent(true);
+      setFeedbackText("");
+    } else {
+      setFeedbackError(data.error ?? "提交失败");
     }
   }
 
@@ -236,6 +261,19 @@ export default function MePage() {
           )}
 
           <button
+            onClick={() => {
+              setFeedbackOpen(true);
+              setFeedbackText("");
+              setFeedbackSent(false);
+              setFeedbackError("");
+            }}
+            className="flex h-12 w-full items-center gap-3 border-b border-sand px-4 text-left text-[15px] text-ink active:bg-sand"
+          >
+            <MessageSquare className="h-5 w-5 text-muted" strokeWidth={1.8} />
+            <span>报告问题</span>
+          </button>
+
+          <button
             onClick={logout}
             className="flex h-12 w-full items-center gap-3 border-t border-sand px-4 text-left text-[15px] text-ink active:bg-sand"
           >
@@ -298,6 +336,38 @@ export default function MePage() {
         >
           {editBusy ? "保存中…" : "保存"}
         </button>
+      </BottomSheet>
+
+      <BottomSheet
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        title="报告问题"
+      >
+        {feedbackSent ? (
+          <p className="py-10 text-center text-sm text-ink">
+            已收到你的反馈，谢谢！
+          </p>
+        ) : (
+          <>
+            <textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="描述你遇到的问题，或想反馈的建议…"
+              rows={5}
+              className="w-full resize-none rounded-[11px] border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+            />
+            {feedbackError && (
+              <p className="mt-2 text-xs text-[#c65c5c]">{feedbackError}</p>
+            )}
+            <button
+              onClick={submitFeedback}
+              disabled={!feedbackText.trim() || feedbackBusy}
+              className="mt-4 w-full rounded-[11px] bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+            >
+              {feedbackBusy ? "提交中…" : "提交"}
+            </button>
+          </>
+        )}
       </BottomSheet>
     </div>
   );
