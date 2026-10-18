@@ -119,7 +119,9 @@ export default function TagsPage() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-2.5">
-            {userTags.map((tag) => (
+            {[...userTags]
+              .sort((a, b) => (tagCounts.get(b) ?? 0) - (tagCounts.get(a) ?? 0))
+              .map((tag) => (
               <span
                 key={tag}
                 className="inline-flex items-center gap-1.5 rounded-[11px] border border-sand bg-white px-3 py-2.5 text-[13px] text-ink"

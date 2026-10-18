@@ -3,7 +3,7 @@ import { matchAdapter } from "@/adapters";
 import type { FetchedMeta } from "@/adapters/types";
 import { requireUser, UnauthorizedError } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { extractUrls } from "@/lib/extract";
+import { extractTitle, extractUrls } from "@/lib/extract";
 import { resolveUrl } from "@/lib/resolve";
 
 type FetchLogEntry = {
@@ -139,13 +139,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ...existing, alreadyExists: true });
   }
 
+  const textTitle = extractTitle(text);
   const favorite = await db.favorite.create({
     data: {
       userId: user.id,
       url: meta.canonicalUrl,
       canonicalUrl: meta.canonicalUrl,
       platform: adapter.name,
-      title: meta.title,
+      title: textTitle || meta.title,
       cover: meta.cover,
       author: meta.author,
       tags: Array.isArray(body.tags) ? body.tags : [],

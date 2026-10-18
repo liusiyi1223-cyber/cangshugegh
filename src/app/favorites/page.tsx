@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Bookmark, Plus, Search, UserRound, X } from "lucide-react";
+import { Bookmark, Search, UserRound, X } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
 import { PLATFORMS } from "@/lib/platforms";
 import BottomNav from "@/components/mobile/BottomNav";
@@ -29,7 +29,6 @@ export default function FavoritesPage() {
   const [shareTags, setShareTags] = useState("");
   const [userTags, setUserTags] = useState<string[]>([]);
   const [manualPlatform, setManualPlatform] = useState("bilibili");
-  const [manualTags, setManualTags] = useState("");
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
     null
   );
@@ -68,6 +67,18 @@ export default function FavoritesPage() {
     });
   }, [items, query, filter]);
 
+  async function syncNewTags(tagsInput: string) {
+    const newTags = parseTags(tagsInput).filter((t) => !userTags.includes(t));
+    if (newTags.length === 0) return;
+    const nextTags = [...userTags, ...newTags];
+    const res = await fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tags: nextTags }),
+    });
+    if (res.ok) setUserTags(nextTags);
+  }
+
   function toggleShareTag(tag: string) {
     const tags = shareTags
       .split(/[,，]/)
@@ -94,6 +105,7 @@ export default function FavoritesPage() {
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (res.ok) {
+      await syncNewTags(shareTags);
       setShareText("");
       setShareTags("");
       setShowManual(false);
@@ -119,17 +131,17 @@ export default function FavoritesPage() {
         url,
         title,
         platform: manualPlatform,
-        tags: parseTags(manualTags),
+        tags: parseTags(shareTags),
       }),
     });
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (res.ok) {
+      await syncNewTags(shareTags);
       setShareText("");
       setShareTags("");
       setManualUrl("");
       setManualTitle("");
-      setManualTags("");
       setShowManual(false);
       await load();
     } else {
@@ -165,20 +177,9 @@ export default function FavoritesPage() {
       </header>
 
       <main className="mx-auto w-full max-w-[1000px] px-4 pt-5">
-        <div className="mb-3.5 flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold tracking-tight">我的收藏</h2>
-            <p className="mt-1 text-xs text-muted">{items.length} 条收藏</p>
-          </div>
-          <button
-            onClick={() => {
-              document.getElementById("share-text")?.focus();
-            }}
-            className="inline-flex min-h-[42px] items-center gap-2 rounded-[11px] bg-brand px-4 py-2.5 text-[13px] font-semibold text-white"
-          >
-            <Plus size={17} strokeWidth={2} />
-            添加收藏
-          </button>
+        <div className="mb-3.5">
+          <h2 className="text-lg font-bold tracking-tight">我的收藏</h2>
+          <p className="mt-1 text-xs text-muted">{items.length} 条收藏</p>
         </div>
 
         <div className="mb-3 flex h-11 items-center gap-2 rounded-[13px] bg-[#f7f8fa] px-3 text-muted">
@@ -233,7 +234,7 @@ export default function FavoritesPage() {
           />
           {userTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {userTags.map((tag) => {
+              {userTags.slice(0, 8).map((tag) => {
                 const selected = shareTags
                   .split(/[,，]/)
                   .map((t) => t.trim())
@@ -261,6 +262,32 @@ export default function FavoritesPage() {
             placeholder="新建标签（用逗号分隔）"
             className="w-full rounded-[11px] border border-sand bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted"
           />
+          {(() => {
+            const last = shareTags.split(/[,，]/).pop()?.trim() ?? "";
+            const selected = parseTags(shareTags);
+            const matches = userTags.filter(
+              (t) => last && t.includes(last) && !selected.includes(t)
+            );
+            if (matches.length === 0) return null;
+            return (
+              <div className="flex flex-wrap gap-1.5">
+                {matches.slice(0, 6).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => {
+                      const parts = shareTags.split(/[,，]/);
+                      parts[parts.length - 1] = t;
+                      setShareTags(parts.join(", "));
+                    }}
+                    className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-[#697681]"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
           <div className="mt-2 flex items-center justify-between gap-2.5">
             <span className="text-[11px] text-muted">支持 9 个内容平台</span>
             <button
@@ -300,12 +327,6 @@ export default function FavoritesPage() {
                   </option>
                 ))}
               </select>
-              <input
-                value={manualTags}
-                onChange={(e) => setManualTags(e.target.value)}
-                placeholder="标签（用逗号分隔，可选）"
-                className="w-full rounded-[11px] border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted"
-              />
               <button
                 type="button"
                 onClick={addManual}
