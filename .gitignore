@@ -40,3 +40,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 本地工具与参考资源
+/.claude/
+/cloud-favorites-ui/
+/design-reference.png
+/docs/design-compressed.jpg
+/docs/1/
