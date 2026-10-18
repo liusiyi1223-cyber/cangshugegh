@@ -122,14 +122,31 @@ export async function POST(request: Request) {
   try {
     resolved = await resolveUrl(inputUrl);
   } catch {
+    // 短链还原失败：可能是任意网页（Safari 兜底）
+    const fallbackAdapter = matchAdapter(inputUrl);
+    if (fallbackAdapter) {
+      try {
+        const fallbackMeta = await fallbackAdapter.fetchMeta(inputUrl);
+        return save(
+          inputUrl,
+          fallbackMeta.canonicalUrl,
+          body.platform || fallbackAdapter.name,
+          textTitle || fallbackMeta.title,
+          fallbackMeta.cover,
+          fallbackMeta.author
+        );
+      } catch {
+        // 兜底抓取也失败，继续走文字标题兜底
+      }
+    }
     await logFetch({
       platform: null,
       url: inputUrl,
       success: false,
       error: "短链还原失败",
     });
-    if (textTitle) {
-      return save(inputUrl, inputUrl, "unknown", textTitle);
+    if (textTitle || body.platform) {
+      return save(inputUrl, inputUrl, body.platform || "unknown", textTitle);
     }
     return NextResponse.json(
       { error: "抓取失败，请手动补标题", url: inputUrl },

@@ -9,7 +9,14 @@ export const MAX_BYTES = 5 * 1024 * 1024;
 export const MAX_REDIRECTS = 5;
 
 // 短链/跳转域名：还原短链阶段需要先访问它们，还原后再落到平台域名
-export const SHORTLINK_DOMAINS = ["b23.tv", "youtu.be", "xhslink.com"];
+export const SHORTLINK_DOMAINS = [
+  "b23.tv",
+  "youtu.be",
+  "xhslink.com",
+  "xhslink.cn",
+  "instagr.am",
+  "t.co",
+];
 
 function isBlockedIpV4(ip: string): boolean {
   const parts = ip.split(".").map(Number);

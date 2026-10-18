@@ -27,7 +27,7 @@ export default function FavoritesPage() {
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
   const [shareTags, setShareTags] = useState("");
-  const [sharePlatform, setSharePlatform] = useState("auto");
+  const [sharePlatform, setSharePlatform] = useState("other");
   const [userTags, setUserTags] = useState<string[]>([]);
   const [manualPlatform, setManualPlatform] = useState("bilibili");
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
@@ -104,7 +104,7 @@ export default function FavoritesPage() {
       body: JSON.stringify({
         text,
         tags: parseTags(shareTags),
-        platform: sharePlatform === "auto" ? undefined : sharePlatform,
+        platform: sharePlatform,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -294,18 +294,20 @@ export default function FavoritesPage() {
             );
           })()}
           <div className="mt-2 flex items-center justify-between gap-2.5">
-            <select
-              value={sharePlatform}
-              onChange={(e) => setSharePlatform(e.target.value)}
-              className="rounded-[11px] border border-sand bg-white px-2.5 py-2 text-[13px] text-ink outline-none"
-            >
-              <option value="auto">自动识别平台</option>
-              {PLATFORMS.map((p) => (
-                <option key={p.key} value={p.key}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-muted">来源平台</span>
+              <select
+                value={sharePlatform}
+                onChange={(e) => setSharePlatform(e.target.value)}
+                className="rounded-[11px] border border-sand bg-white px-2.5 py-2 text-[13px] text-ink outline-none"
+              >
+                {PLATFORMS.map((p) => (
+                  <option key={p.key} value={p.key}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               type="submit"
               disabled={!shareText.trim() || busy}

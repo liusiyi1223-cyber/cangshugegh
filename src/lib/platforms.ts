@@ -8,6 +8,8 @@ export const PLATFORMS = [
   { key: "wechat", name: "微信公众号" },
   { key: "channels", name: "微信视频号" },
   { key: "youtube", name: "YouTube" },
+  { key: "instagram", name: "Instagram" },
+  { key: "x", name: "X（推特）" },
   { key: "other", name: "其他" },
 ];
 

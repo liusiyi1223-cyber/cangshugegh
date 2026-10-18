@@ -6,6 +6,9 @@ import { douyinAdapter } from "./douyin";
 import { wechatAdapter } from "./wechat";
 import { weiboAdapter } from "./weibo";
 import { xiaohongshuAdapter } from "./xiaohongshu";
+import { instagramAdapter } from "./instagram";
+import { safariAdapter } from "./safari";
+import { xAdapter } from "./x";
 import { youtubeAdapter } from "./youtube";
 import { zhihuAdapter } from "./zhihu";
 
@@ -19,6 +22,9 @@ export const adapters: PlatformAdapter[] = [
   channelsAdapter,
   wechatAdapter,
   youtubeAdapter,
+  instagramAdapter,
+  xAdapter,
+  safariAdapter,
 ];
 
 export function matchAdapter(url: string): PlatformAdapter | undefined {
