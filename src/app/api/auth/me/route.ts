@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { requireUser, UnauthorizedError } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -25,7 +26,7 @@ export async function PATCH(request: Request) {
     throw e;
   }
 
-  let body: { name?: string; avatar?: string; tags?: string[] };
+  let body: { name?: string; avatar?: string; tags?: string[]; preferences?: Record<string, unknown> };
   try {
     body = await request.json();
   } catch {
@@ -36,6 +37,7 @@ export async function PATCH(request: Request) {
     name?: string | null;
     avatar?: string | null;
     tags?: string[];
+    preferences?: Prisma.InputJsonValue;
   } = {};
 
   if (typeof body.name === "string") {
@@ -71,6 +73,15 @@ export async function PATCH(request: Request) {
     }
   }
 
+  if (body.preferences && typeof body.preferences === "object") {
+    const old = await db.user.findUnique({
+      where: { id: user.id },
+      select: { preferences: true },
+    });
+    const prev = (old?.preferences ?? {}) as Record<string, unknown>;
+    data.preferences = { ...prev, ...body.preferences } as Prisma.InputJsonValue;
+  }
+
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "没有要更新的字段" }, { status: 400 });
   }
@@ -85,6 +96,7 @@ export async function PATCH(request: Request) {
       avatar: true,
       tags: true,
       role: true,
+      preferences: true,
     },
   });
 

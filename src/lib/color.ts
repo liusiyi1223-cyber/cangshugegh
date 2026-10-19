@@ -20,3 +20,14 @@ export function darken(hex: string, amount: number): string {
   const toHex = (v: number) => v.toString(16).padStart(2, "0");
   return `#${toHex(d(r))}${toHex(d(g))}${toHex(d(b))}`;
 }
+
+// 根据背景色明度返回可读的文字色：深色用白字，浅色用深字
+export function readableOn(hex: string): string {
+  const [r, g, b] = hexToRgb(hex);
+  const toLinear = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const luminance = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  return luminance > 0.45 ? "#1d2630" : "#ffffff";
+}

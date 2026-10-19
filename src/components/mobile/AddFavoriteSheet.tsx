@@ -1,7 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BottomSheet from "./BottomSheet";
+import { extractTitle, extractUrls } from "@/lib/extract";
+import { PLATFORMS, detectPlatform } from "@/lib/platforms";
+
+function parseTags(s: string): string[] {
+  return s
+    .split(/[,，]/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
 
 export default function AddFavoriteSheet({
   open,
@@ -13,22 +22,57 @@ export default function AddFavoriteSheet({
   onAdded: () => void;
 }) {
   const [text, setText] = useState("");
-  const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [platform, setPlatform] = useState("other");
+  const [userTags, setUserTags] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [showManual, setShowManual] = useState(false);
+  const [manualUrl, setManualUrl] = useState("");
+  const [manualTitle, setManualTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aiTags, setAiTags] = useState<string[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiIcon, setAiIcon] = useState<string | null>(null);
+  const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!open) {
-      setText("");
-      setUrl("");
-      setTitle("");
-      setError("");
-      setShowManual(false);
-      setLoading(false);
-    }
+    if (!open) return;
+    setText("");
+    setTitle("");
+    setTagInput("");
+    setPlatform("other");
+    setError("");
+    setShowManual(false);
+    setManualUrl("");
+    setManualTitle("");
+    setLoading(false);
+    setAiTags([]);
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((u) => setUserTags(u?.tags ?? []));
   }, [open]);
+
+  function toggleTag(tag: string) {
+    const tags = parseTags(tagInput);
+    setTagInput(
+      tags.includes(tag)
+        ? tags.filter((t) => t !== tag).join(", ")
+        : [...tags, tag].join(", ")
+    );
+  }
+
+  async function syncNewTags(tagsInput: string) {
+    const newTags = parseTags(tagsInput).filter((t) => !userTags.includes(t));
+    if (newTags.length === 0) return;
+    const next = [...userTags, ...newTags];
+    const res = await fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tags: next }),
+    });
+    if (res.ok) setUserTags(next);
+  }
 
   async function handleParse() {
     const t = text.trim();
@@ -38,35 +82,48 @@ export default function AddFavoriteSheet({
     const res = await fetch("/api/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: t }),
+      body: JSON.stringify({
+        text: t,
+        title: title || undefined,
+        tags: parseTags(tagInput),
+        platform,
+        icon: aiIcon || undefined,
+      }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (res.ok) {
-      setText("");
+      await syncNewTags(tagInput);
       onClose();
       onAdded();
     } else {
       setError(data.error ?? "出错了");
       setShowManual(true);
-      if (data.url) setUrl(data.url);
+      if (data.url) setManualUrl(data.url);
     }
   }
 
   async function handleManual() {
-    const u = url.trim();
-    const t = title.trim();
+    const u = manualUrl.trim();
+    const t = manualTitle.trim();
     if (!u || !t) return;
     setLoading(true);
     setError("");
     const res = await fetch("/api/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: u, title: t }),
+      body: JSON.stringify({
+        url: u,
+        title: t,
+        tags: parseTags(tagInput),
+        platform,
+        icon: aiIcon || undefined,
+      }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (res.ok) {
+      await syncNewTags(tagInput);
       onClose();
       onAdded();
     } else {
@@ -75,47 +132,152 @@ export default function AddFavoriteSheet({
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="添加收藏">
+    <BottomSheet open={open} onClose={onClose} title="添加收藏" variant="center">
       <textarea
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => {
+          setText(e.target.value);
+          const t = extractTitle(e.target.value);
+          if (t) setTitle(t);
+          const urls = extractUrls(e.target.value);
+          if (urls.length > 0) {
+            const detected = detectPlatform(urls[0]);
+            if (detected) setPlatform(detected);
+          }
+          if (aiTimerRef.current) clearTimeout(aiTimerRef.current);
+          if (t.trim()) {
+            aiTimerRef.current = setTimeout(async () => {
+              setAiLoading(true);
+              try {
+                const res = await fetch("/api/ai/tags", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ title: t.trim() }),
+                });
+                if (res.ok) {
+                  const data = await res.json();
+                  setAiTags(data.tags ?? []);
+                  if (data.icon) setAiIcon(data.icon);
+                }
+              } catch {
+                // AI 失败静默忽略
+              } finally {
+                setAiLoading(false);
+              }
+            }, 400);
+          }
+        }}
         placeholder="粘贴分享文本或链接…"
         autoFocus
-        rows={4}
-        className="w-full resize-none rounded-xl bg-surface p-3 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        rows={3}
+        className="w-full resize-none rounded-xl bg-cream p-3 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
+
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="标题（自动识别，可修改）"
+        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+      />
+
+      {userTags.length > 0 && (
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {userTags.map((tag) => {
+            const selected = parseTags(tagInput).includes(tag);
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                className={`rounded-full px-2.5 py-1 text-xs ${
+                  selected ? "bg-brand text-onbrand" : "bg-brand-soft text-ink"
+                }`}
+              >
+                #{tag}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <input
+        value={tagInput}
+        onChange={(e) => setTagInput(e.target.value)}
+        placeholder="新建标签（逗号分隔）"
+        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+      />
+
+      {(aiTags.length > 0 || aiLoading) && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-muted">AI 推荐</span>
+          {aiLoading && aiTags.length === 0 && (
+            <span className="text-xs text-muted">加载中…</span>
+          )}
+          {aiTags.map((tag) => {
+            const selected = parseTags(tagInput).includes(tag);
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                className={`rounded-full px-2.5 py-1 text-xs ${
+                  selected ? "bg-brand text-onbrand" : "bg-tag text-muted"
+                }`}
+              >
+                #{tag}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="mt-2.5 flex items-center gap-2">
+        <span className="shrink-0 text-xs text-muted">平台</span>
+        <select
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value)}
+          className="flex-1 rounded-xl bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand focus:outline-none focus:ring-brand"
+        >
+          <option value="other">其他 / 自动识别</option>
+          {PLATFORMS.map((p) => (
+            <option key={p.key} value={p.key}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <button
         type="button"
         onClick={handleParse}
-        disabled={loading}
-        className="mt-3 w-full rounded-full bg-brand py-3 text-base font-medium text-onbrand transition disabled:opacity-50"
+        disabled={loading || !text.trim()}
+        className="mt-3 w-full rounded-xl bg-gradient-to-r from-[#1b3a63] to-[#4f7df9] py-3 text-base font-medium text-white shadow-md shadow-[#1b3a63]/25 transition disabled:opacity-50"
       >
         {loading ? "解析中…" : "解析并保存"}
       </button>
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
       {showManual && (
-        <div className="mt-4 rounded-xl bg-surface p-3 ring-1 ring-sand">
+        <div className="mt-4 rounded-xl bg-cream p-3 ring-1 ring-sand">
           <p className="text-sm font-medium text-ink">手动添加</p>
           <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="链接"
-            className="mt-2 w-full rounded-lg bg-cream px-3 py-2 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+            value={manualUrl}
+            onChange={(e) => setManualUrl(e.target.value)}
+            placeholder="链接 *"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
           />
           <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="标题"
-            className="mt-2 w-full rounded-lg bg-cream px-3 py-2 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+            value={manualTitle}
+            onChange={(e) => setManualTitle(e.target.value)}
+            placeholder="标题 *"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
           />
           <button
             type="button"
             onClick={handleManual}
             disabled={loading}
-            className="mt-3 w-full rounded-full bg-surface py-2.5 text-sm font-medium text-ink ring-1 ring-sand transition disabled:opacity-50"
+            className="mt-3 w-full rounded-xl bg-white py-2.5 text-sm font-medium text-ink ring-1 ring-sand transition disabled:opacity-50"
           >
             {loading ? "保存中…" : "手动保存"}
           </button>

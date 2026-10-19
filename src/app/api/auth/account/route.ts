@@ -13,8 +13,6 @@ export async function DELETE() {
     throw e;
   }
 
-  // collections 无级联删除，先手动删；favorites 由 user 的 onDelete Cascade 级联删除
-  await db.collection.deleteMany({ where: { userId: user.id } });
   await db.user.delete({ where: { id: user.id } });
   await destroySession();
 

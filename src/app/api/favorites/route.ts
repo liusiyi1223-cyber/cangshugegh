@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     throw e;
   }
 
-  let body: { text?: string; url?: string; title?: string; tags?: string[]; platform?: string; cover?: string };
+  let body: { text?: string; url?: string; title?: string; tags?: string[]; platform?: string; cover?: string; icon?: string };
   try {
     body = await request.json();
   } catch {
@@ -62,8 +62,7 @@ export async function POST(request: Request) {
 
     const inputUrl = body.url;
     const canonicalUrl = await resolveUrl(inputUrl).catch(() => inputUrl);
-    const platform =
-      body.platform || matchAdapter(canonicalUrl)?.name || "unknown";
+    const platform = resolvePlatform(body.platform, matchAdapter(canonicalUrl)?.name);
     const tags = Array.isArray(body.tags) ? body.tags : [];
 
     const existing = await db.favorite.findUnique({
@@ -95,6 +94,7 @@ export async function POST(request: Request) {
         title,
         cover: await persistCover(cover),
         tags,
+        icon: body.icon || null,
       },
     });
     return NextResponse.json(favorite, { status: 201 });
@@ -141,6 +141,7 @@ export async function POST(request: Request) {
         cover: await persistCover(cover),
         author,
         tags,
+        icon: body.icon || null,
       },
     });
     return NextResponse.json(favorite, { status: 201 });
@@ -231,20 +232,13 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim();
-  const collectionId = searchParams.get("collectionId")?.trim();
 
   const favorites = await db.favorite.findMany({
     where: {
       userId: user.id,
       ...(q ? { title: { contains: q, mode: "insensitive" } } : {}),
-      ...(collectionId === "unfiled"
-        ? { collections: { none: {} } }
-        : collectionId
-          ? { collections: { some: { id: collectionId } } }
-          : {}),
     },
     orderBy: { createdAt: "desc" },
-    include: { collections: { select: { id: true, name: true } } },
   });
 
   return NextResponse.json(favorites);

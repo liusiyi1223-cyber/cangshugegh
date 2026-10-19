@@ -9,12 +9,14 @@ export default function BottomSheet({
   title,
   children,
   zIndex = "z-[60]",
+  variant = "bottom",
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
   zIndex?: string;
+  variant?: "bottom" | "center";
 }) {
   useEffect(() => {
     if (!open) return;
@@ -27,17 +29,27 @@ export default function BottomSheet({
 
   if (!open) return null;
 
+  const isCenter = variant === "center";
+
   return (
     <div className={`fixed inset-0 ${zIndex}`}>
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <div
-        className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[85vh] max-w-md flex-col rounded-t-2xl bg-cream animate-[sheet-up_0.25s_ease-out]"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className={
+          isCenter
+            ? "absolute inset-0 m-auto flex max-h-[85vh] w-[calc(100%-2.5rem)] max-w-sm flex-col rounded-2xl bg-white shadow-xl"
+            : "absolute inset-x-0 bottom-0 mx-auto flex max-h-[85vh] max-w-md flex-col rounded-t-2xl bg-cream animate-[sheet-up_0.25s_ease-out]"
+        }
+        style={
+          isCenter ? undefined : { paddingBottom: "env(safe-area-inset-bottom)" }
+        }
       >
-        <div className="flex justify-center pt-2.5">
-          <div className="h-1 w-10 rounded-full bg-sand" />
-        </div>
+        {!isCenter && (
+          <div className="flex justify-center pt-2.5">
+            <div className="h-1 w-10 rounded-full bg-sand" />
+          </div>
+        )}
 
         {title ? (
           <div className="flex items-center justify-between px-4 pb-2 pt-3">
@@ -52,7 +64,7 @@ export default function BottomSheet({
             </button>
           </div>
         ) : (
-          <div className="pb-2" />
+          !isCenter && <div className="pb-2" />
         )}
 
         <div className="overflow-y-auto px-4 pb-4">{children}</div>

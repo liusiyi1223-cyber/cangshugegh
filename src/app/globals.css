@@ -13,16 +13,18 @@
 }
 
 @theme {
-  --color-cream: #ffffff;
+  --color-cream: #eceff2;
   --color-surface: #ffffff;
-  --color-sand: #e9edf1;
+  --color-sand: #e0e5eb;
   --color-ink: #1d2630;
-  --color-muted: #89919b;
-  --color-brand: #243342;
-  --color-brand-dark: #34495b;
-  --color-brand-soft: #eef3f7;
+  --color-muted: #6b7783;
+  --color-brand: #1b3a63;
+  --color-brand-dark: #153356;
+  --color-brand-soft: #e8edf4;
   --color-onbrand: #ffffff;
   --color-tag: #f4f6f8;
+  --color-danger: #c65c5c;
+  --shadow-card: 0 1px 2px rgba(29, 38, 48, 0.06), 0 4px 14px rgba(29, 38, 48, 0.12);
 }
 
 body {

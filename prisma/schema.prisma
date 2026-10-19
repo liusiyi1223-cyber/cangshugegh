@@ -19,6 +19,7 @@ model User {
   avatar       String?
   tags         String[]   @default([])
   role         String     @default("USER")
+  preferences  Json?
   createdAt    DateTime   @default(now())
   favorites    Favorite[]
 }
@@ -37,7 +38,8 @@ model Favorite {
   note         String?
   status       FavoriteStatus @default(ACTIVE)
   createdAt    DateTime       @default(now())
-  collections  Collection[]
+  visitCount   Int            @default(0)
+  icon         String?
 
   @@unique([userId, canonicalUrl])
   @@index([userId])
@@ -57,14 +59,4 @@ model Feedback {
   userId    String?
   content   String
   createdAt DateTime @default(now())
-}
-
-model Collection {
-  id        String     @id @default(cuid())
-  userId    String
-  name      String
-  createdAt DateTime   @default(now())
-  favorites Favorite[]
-
-  @@index([userId])
 }

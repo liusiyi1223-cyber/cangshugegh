@@ -87,9 +87,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-white p-6">
-      <div className="w-full max-w-[400px] rounded-[20px] border border-sand bg-white p-7 shadow-sm">
-        <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-[15px] bg-brand-soft text-brand">
+    <main className="grid min-h-dvh place-items-center bg-background p-6">
+      <div className="w-full max-w-[400px] rounded-2xl bg-white p-7 shadow-card">
+        <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-2xl bg-brand-soft text-brand">
           <Bookmark size={27} strokeWidth={1.8} />
         </div>
         <h1 className="text-[25px] font-extrabold tracking-tight text-ink">
@@ -110,7 +110,7 @@ export default function RegisterPage() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <User size={36} className="text-[#647584]" strokeWidth={1.5} />
+                <User size={36} className="text-muted" strokeWidth={1.5} />
               )}
             </div>
             <span className="mt-2 block text-center text-xs text-muted">
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             placeholder="设置你的昵称"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-[11px] border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+            className="w-full rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
           />
 
           <label className="mb-1.5 mt-3.5 block text-xs font-semibold text-ink">
@@ -153,7 +153,7 @@ export default function RegisterPage() {
               placeholder="请输入邮箱"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-[11px] border border-sand py-3 pl-10 pr-3 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+              className="w-full rounded-xl border border-sand py-3 pl-10 pr-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
             />
           </div>
 
@@ -167,13 +167,13 @@ export default function RegisterPage() {
               placeholder="6 位验证码"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="min-w-0 flex-1 rounded-[11px] border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+              className="min-w-0 flex-1 rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
             />
             <button
               type="button"
               onClick={sendCode}
               disabled={sending || countdown > 0}
-              className="shrink-0 rounded-[11px] border border-sand px-3.5 text-[13px] font-medium text-brand disabled:opacity-55"
+              className="shrink-0 rounded-xl border border-sand px-3.5 text-[13px] font-medium text-brand disabled:opacity-55"
             >
               {countdown > 0 ? `${countdown}s 后重发` : "发送验证码"}
             </button>
@@ -196,7 +196,7 @@ export default function RegisterPage() {
               placeholder="请输入密码（至少 8 位）"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-[11px] border border-sand py-3 pl-10 pr-11 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+              className="w-full rounded-xl border border-sand py-3 pl-10 pr-11 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
             />
             <button
               type="button"
@@ -212,12 +212,12 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {error && <p className="mt-2 text-xs text-[#c65c5c]">{error}</p>}
+          {error && <p className="mt-2 text-xs text-danger">{error}</p>}
 
           <button
             type="submit"
             disabled={busy}
-            className="mt-5 w-full rounded-[11px] bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+            className="mt-5 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
           >
             {busy ? "请稍候…" : "创建账号"}
           </button>

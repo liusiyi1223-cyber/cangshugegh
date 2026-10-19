@@ -19,7 +19,7 @@ export async function PATCH(
 
   const { id } = await params;
 
-  let body: { tags?: string[]; status?: string; title?: string; collectionIds?: string[]; cover?: string | null };
+  let body: { tags?: string[]; status?: string; title?: string; cover?: string | null; incrementVisit?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -36,7 +36,7 @@ export async function PATCH(
     status?: "ACTIVE" | "BROKEN";
     title?: string;
     cover?: string | null;
-    collections?: { set: { id: string }[] };
+    visitCount?: { increment: number };
   } = {};
 
   if (typeof body.title === "string") {
@@ -63,18 +63,9 @@ export async function PATCH(
       if (stored) data.cover = stored;
     }
   }
-  if (Array.isArray(body.collectionIds)) {
-    const ids = body.collectionIds.filter(
-      (c): c is string => typeof c === "string"
-    );
-    // 只允许连接到当前用户自己的收藏夹，防止跨用户关联
-    const owned = await db.collection.findMany({
-      where: { id: { in: ids }, userId: user.id },
-      select: { id: true },
-    });
-    data.collections = { set: owned.map((c) => ({ id: c.id })) };
+  if (body.incrementVisit) {
+    data.visitCount = { increment: 1 };
   }
-
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "没有要更新的字段" }, { status: 400 });
   }
@@ -82,7 +73,6 @@ export async function PATCH(
   const favorite = await db.favorite.update({
     where: { id },
     data,
-    include: { collections: { select: { id: true, name: true } } },
   });
 
   return NextResponse.json(favorite);

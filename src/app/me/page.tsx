@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import BottomSheet from "@/components/mobile/BottomSheet";
 import { compressImage } from "@/lib/image";
+import { useThemeColor } from "@/lib/useThemeColor";
 
 type User = {
   id: string;
@@ -52,6 +53,7 @@ function StatRow({ s }: { s: Stat }) {
 
 export default function MePage() {
   const router = useRouter();
+  const { themeStyle } = useThemeColor();
   const [user, setUser] = useState<User | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -172,7 +174,7 @@ export default function MePage() {
   }
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-white pb-[90px]">
+    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]" style={themeStyle}>
       <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-sand bg-white px-4 py-3">
         <button
           onClick={() => router.back()}
@@ -185,7 +187,7 @@ export default function MePage() {
       </header>
 
       <main className="px-4 pt-3">
-        <div className="rounded-2xl bg-white p-4 ring-1 ring-sand">
+        <div className="rounded-2xl bg-white p-4 shadow-card">
           <button
             onClick={openEdit}
             className="flex w-full items-center gap-3 text-left"
@@ -201,7 +203,7 @@ export default function MePage() {
               ) : (
                 <UserIcon
                   size={28}
-                  className="text-[#647584]"
+                  className="text-muted"
                   strokeWidth={1.5}
                 />
               )}
@@ -216,7 +218,7 @@ export default function MePage() {
           </button>
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-2xl bg-white ring-1 ring-sand">
+        <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-card">
           <button
             onClick={toggleStats}
             className="flex h-12 w-full items-center gap-3 border-b border-sand px-4 text-left text-[15px] text-ink active:bg-sand"
@@ -305,7 +307,7 @@ export default function MePage() {
               ) : (
                 <UserIcon
                   size={36}
-                  className="text-[#647584]"
+                  className="text-muted"
                   strokeWidth={1.5}
                 />
               )}
@@ -326,13 +328,13 @@ export default function MePage() {
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
           placeholder="昵称"
-          className="w-full rounded-[11px] border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+          className="w-full rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
         />
-        {editError && <p className="mt-2 text-xs text-[#c65c5c]">{editError}</p>}
+        {editError && <p className="mt-2 text-xs text-danger">{editError}</p>}
         <button
           onClick={saveProfile}
           disabled={editBusy}
-          className="mt-4 w-full rounded-[11px] bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+          className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
         >
           {editBusy ? "保存中…" : "保存"}
         </button>
@@ -354,15 +356,15 @@ export default function MePage() {
               onChange={(e) => setFeedbackText(e.target.value)}
               placeholder="描述你遇到的问题，或想反馈的建议…"
               rows={5}
-              className="w-full resize-none rounded-[11px] border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+              className="w-full resize-none rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
             />
             {feedbackError && (
-              <p className="mt-2 text-xs text-[#c65c5c]">{feedbackError}</p>
+              <p className="mt-2 text-xs text-danger">{feedbackError}</p>
             )}
             <button
               onClick={submitFeedback}
               disabled={!feedbackText.trim() || feedbackBusy}
-              className="mt-4 w-full rounded-[11px] bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+              className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
             >
               {feedbackBusy ? "提交中…" : "提交"}
             </button>

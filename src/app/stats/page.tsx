@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BottomNav from "@/components/mobile/BottomNav";
+import { useThemeColor } from "@/lib/useThemeColor";
 
 type Stat = {
   platform: string;
@@ -12,6 +13,7 @@ type Stat = {
 };
 
 export default function StatsPage() {
+  const { themeStyle } = useThemeColor();
   const [stats, setStats] = useState<Stat[]>([]);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [error, setError] = useState("");
@@ -37,7 +39,7 @@ export default function StatsPage() {
   const failed = stats.reduce((s, x) => s + x.failed, 0);
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-white pb-[90px]">
+    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]" style={themeStyle}>
       <header className="sticky top-0 z-30 border-b border-sand bg-white px-4 pb-3 pt-4">
         <h1 className="text-lg font-bold tracking-tight text-ink">统计</h1>
         <p className="mt-1 text-xs text-muted">查看各平台链接抓取情况</p>
@@ -49,25 +51,25 @@ export default function StatsPage() {
         ) : (
           <>
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-sand bg-white p-4">
+              <div className="rounded-2xl bg-white p-4 shadow-card">
                 <span className="text-xs text-muted">抓取总次数</span>
                 <div className="mt-2 text-[26px] font-bold tracking-tight text-ink">
                   {total}
                 </div>
               </div>
-              <div className="rounded-2xl border border-sand bg-white p-4">
+              <div className="rounded-2xl bg-white p-4 shadow-card">
                 <span className="text-xs text-muted">抓取成功</span>
                 <div className="mt-2 text-[26px] font-bold tracking-tight text-ink">
                   {success}
                 </div>
               </div>
-              <div className="rounded-2xl border border-sand bg-white p-4">
+              <div className="rounded-2xl bg-white p-4 shadow-card">
                 <span className="text-xs text-muted">抓取失败</span>
                 <div className="mt-2 text-[26px] font-bold tracking-tight text-ink">
                   {failed}
                 </div>
               </div>
-              <div className="rounded-2xl border border-sand bg-white p-4">
+              <div className="rounded-2xl bg-white p-4 shadow-card">
                 <span className="text-xs text-muted">收藏总数</span>
                 <div className="mt-2 text-[26px] font-bold tracking-tight text-ink">
                   {favoriteCount}

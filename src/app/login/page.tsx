@@ -86,9 +86,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-white p-4">
-      <div className="w-full max-w-md rounded-[20px] border border-sand bg-white px-7 py-10 shadow-sm">
-        <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-[15px] bg-brand-soft text-brand">
+    <main className="grid min-h-dvh place-items-center bg-background p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white px-7 py-10 shadow-card">
+        <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-2xl bg-brand-soft text-brand">
           <Bookmark size={27} strokeWidth={1.8} />
         </div>
         <h1 className="text-[25px] font-extrabold tracking-tight text-ink">
@@ -138,7 +138,7 @@ export default function LoginPage() {
               placeholder="请输入邮箱"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-[11px] border border-sand py-3 pl-10 pr-3 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+              className="w-full rounded-xl border border-sand py-3 pl-10 pr-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
             />
           </div>
 
@@ -161,7 +161,7 @@ export default function LoginPage() {
                   placeholder="请输入密码"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-[11px] border border-sand py-3 pl-10 pr-11 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+                  className="w-full rounded-xl border border-sand py-3 pl-10 pr-11 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
                 />
                 <button
                   type="button"
@@ -192,20 +192,20 @@ export default function LoginPage() {
                 placeholder="6 位验证码"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="min-w-0 flex-1 rounded-[11px] border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-[#b8c9d6]"
+                className="min-w-0 flex-1 rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
               />
               <button
                 type="button"
                 onClick={sendCode}
                 disabled={sending || countdown > 0}
-                className="shrink-0 rounded-[11px] border border-sand px-3.5 text-[13px] font-medium text-brand disabled:opacity-55"
+                className="shrink-0 rounded-xl border border-sand px-3.5 text-[13px] font-medium text-brand disabled:opacity-55"
               >
                 {countdown > 0 ? `${countdown}s 后重发` : "发送验证码"}
               </button>
             </div>
           )}
 
-          {error && <p className="mt-2 text-xs text-[#c65c5c]">{error}</p>}
+          {error && <p className="mt-2 text-xs text-danger">{error}</p>}
 
           <label className="mt-3 flex items-center gap-2 text-[13px] text-muted">
             <input
@@ -220,7 +220,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-5 w-full rounded-[11px] border border-brand bg-white py-3 text-[13px] font-semibold text-brand disabled:opacity-55"
+            className="mt-5 w-full rounded-xl border border-brand bg-white py-3 text-[13px] font-semibold text-brand disabled:opacity-55"
           >
             {busy ? "请稍候…" : "登录"}
           </button>

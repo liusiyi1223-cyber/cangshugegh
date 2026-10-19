@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
+import { Prisma } from "@prisma/client";
 import { cookies } from "next/headers";
 import { db } from "./db";
 
@@ -55,6 +56,7 @@ export async function getSessionUser(): Promise<{
   avatar: string | null;
   tags: string[];
   role: string;
+  preferences: Prisma.JsonValue | null;
 } | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
@@ -73,6 +75,7 @@ export async function getSessionUser(): Promise<{
         avatar: true,
         tags: true,
         role: true,
+        preferences: true,
       },
     });
   } catch {
@@ -88,6 +91,7 @@ export async function requireUser(): Promise<{
   avatar: string | null;
   tags: string[];
   role: string;
+  preferences: Prisma.JsonValue | null;
 }> {
   const user = await getSessionUser();
   if (!user) throw new UnauthorizedError();

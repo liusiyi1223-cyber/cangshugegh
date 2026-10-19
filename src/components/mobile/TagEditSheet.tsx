@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Favorite } from "@prisma/client";
 import { X } from "lucide-react";
 import BottomSheet from "./BottomSheet";
@@ -18,6 +18,7 @@ export default function TagEditSheet({
 }) {
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
   const [input, setInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [userTags, setUserTags] = useState<string[]>([]);
@@ -33,6 +34,14 @@ export default function TagEditSheet({
         .then((u) => setUserTags(u?.tags ?? []));
     }
   }, [open, favorite]);
+
+  useEffect(() => {
+    const el = titleRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [open, title]);
 
   function addTag(t: string) {
     const tag = t.trim();
@@ -74,11 +83,13 @@ export default function TagEditSheet({
       <label className="mb-1.5 block text-xs font-semibold text-ink">
         标题
       </label>
-      <input
+      <textarea
+        ref={titleRef}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="标题"
-        className="w-full rounded-[11px] border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+        rows={1}
+        className="w-full resize-none overflow-hidden rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
       />
 
       <label className="mb-1.5 mt-4 block text-xs font-semibold text-ink">
@@ -114,7 +125,7 @@ export default function TagEditSheet({
               key={t}
               type="button"
               onClick={() => addTag(t)}
-              className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-[#697681]"
+              className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-muted"
             >
               #{t}
             </button>

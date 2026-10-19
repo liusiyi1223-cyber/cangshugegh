@@ -1,0 +1,73 @@
+import type { ComponentType } from "react";
+import {
+  BookOpen,
+  Briefcase,
+  Camera,
+  Car,
+  Cloud,
+  Code,
+  Coffee,
+  Dumbbell,
+  Film,
+  Flame,
+  Gamepad2,
+  Globe,
+  GraduationCap,
+  Heart,
+  Home,
+  Leaf,
+  Lightbulb,
+  MessageCircle,
+  Mic,
+  Music,
+  Newspaper,
+  Palette,
+  PenTool,
+  Plane,
+  Rocket,
+  ShoppingBag,
+  Smartphone,
+  Star,
+  Utensils,
+  Wrench,
+} from "lucide-react";
+
+type IconType = ComponentType<{ size?: number | string; className?: string }>;
+
+export const iconMap: Record<string, IconType> = {
+  BookOpen,
+  Briefcase,
+  Camera,
+  Car,
+  Cloud,
+  Code,
+  Coffee,
+  Dumbbell,
+  Film,
+  Flame,
+  Gamepad2,
+  Globe,
+  GraduationCap,
+  Heart,
+  Home,
+  Leaf,
+  Lightbulb,
+  MessageCircle,
+  Mic,
+  Music,
+  Newspaper,
+  Palette,
+  PenTool,
+  Plane,
+  Rocket,
+  ShoppingBag,
+  Smartphone,
+  Star,
+  Utensils,
+  Wrench,
+};
+
+export function iconFor(name?: string | null): IconType {
+  if (name && iconMap[name]) return iconMap[name];
+  return BookOpen;
+}

@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import {
-  AlertTriangle,
+  Copy,
   ExternalLink,
   Image as ImageIcon,
-  RotateCcw,
   Tag,
   Trash,
 } from "lucide-react";
@@ -24,7 +23,7 @@ export default function FavoriteActionSheet({
 }) {
   const [busy, setBusy] = useState(false);
   const [tagOpen, setTagOpen] = useState(false);
-  const [coverError, setCoverError] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!favorite) return;
@@ -35,28 +34,9 @@ export default function FavoriteActionSheet({
     };
   }, [favorite]);
 
-  useEffect(() => {
-    setCoverError(false);
-  }, [favorite?.id]);
-
   if (!favorite) return null;
 
   const f = favorite;
-  const broken = f.status === "BROKEN";
-
-  async function toggleStatus() {
-    setBusy(true);
-    const res = await fetch(`/api/favorites/${f.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: broken ? "ACTIVE" : "BROKEN" }),
-    });
-    setBusy(false);
-    if (res.ok) {
-      onChanged();
-      onClose();
-    }
-  }
 
   async function remove() {
     if (!confirm("确定删除这条收藏？")) return;
@@ -68,6 +48,16 @@ export default function FavoriteActionSheet({
     if (res.ok) {
       onChanged();
       onClose();
+    }
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(f.url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // 剪贴板不可用
     }
   }
 
@@ -95,7 +85,9 @@ export default function FavoriteActionSheet({
 
   const rowClass =
     "flex h-12 w-full items-center gap-3 px-4 text-left text-[15px] text-ink active:bg-sand";
-  const iconClass = "h-5 w-5 text-muted";
+  const iconWrap =
+    "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand";
+  const iconClass = "h-4 w-4";
 
   return (
     <>
@@ -110,55 +102,54 @@ export default function FavoriteActionSheet({
             <div className="h-1 w-10 rounded-full bg-sand" />
           </div>
 
-          <div className="flex gap-3 px-4 pb-3 pt-3">
-            <div className="h-[54px] w-[96px] shrink-0 overflow-hidden rounded-lg bg-brand-soft">
-              {f.cover && !coverError ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={f.cover}
-                  alt=""
-                  referrerPolicy="no-referrer"
-                  onError={() => setCoverError(true)}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-muted">
-                  <ImageIcon className="h-6 w-6" strokeWidth={1.5} />
-                </div>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="line-clamp-2 text-sm font-medium leading-snug text-ink">
-                {f.title}
-              </h2>
-              <p className="mt-1 line-clamp-1 text-xs text-muted">
-                {[f.author, f.platform].filter(Boolean).join(" · ") || " "}
-              </p>
-            </div>
-          </div>
-
-          <div className="overflow-y-auto pb-2">
+          <div className="overflow-y-auto pb-2 pt-2">
             <a
               href={f.url}
               target="_blank"
               rel="noreferrer"
               className={rowClass}
+              onClick={() => {
+                fetch(`/api/favorites/${f.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ incrementVisit: true }),
+                })
+                  .then(() => onChanged())
+                  .catch(() => {});
+              }}
             >
-              <ExternalLink className={iconClass} strokeWidth={1.8} />
+              <span className={iconWrap}>
+                <ExternalLink className={iconClass} strokeWidth={1.8} />
+              </span>
               <span>打开原链接</span>
             </a>
 
             <button
               type="button"
               className={rowClass}
+              onClick={copyLink}
+            >
+              <span className={iconWrap}>
+                <Copy className={iconClass} strokeWidth={1.8} />
+              </span>
+              <span>{copied ? "已复制" : "复制原链接"}</span>
+            </button>
+
+            <button
+              type="button"
+              className={rowClass}
               onClick={() => setTagOpen(true)}
             >
-              <Tag className={iconClass} strokeWidth={1.8} />
+              <span className={iconWrap}>
+                <Tag className={iconClass} strokeWidth={1.8} />
+              </span>
               <span>编辑</span>
             </button>
 
             <label className={rowClass}>
-              <ImageIcon className={iconClass} strokeWidth={1.8} />
+              <span className={iconWrap}>
+                <ImageIcon className={iconClass} strokeWidth={1.8} />
+              </span>
               <span>{f.cover ? "更换封面" : "补封面"}</span>
               <input
                 type="file"
@@ -170,25 +161,13 @@ export default function FavoriteActionSheet({
 
             <button
               type="button"
-              className={rowClass}
-              onClick={toggleStatus}
-              disabled={busy}
-            >
-              {broken ? (
-                <RotateCcw className={iconClass} strokeWidth={1.8} />
-              ) : (
-                <AlertTriangle className={iconClass} strokeWidth={1.8} />
-              )}
-              <span>{broken ? "恢复为正常" : "标记为已失效"}</span>
-            </button>
-
-            <button
-              type="button"
               className={`${rowClass} text-red-600`}
               onClick={remove}
               disabled={busy}
             >
-              <Trash className="h-5 w-5 text-red-600" strokeWidth={1.8} />
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-red-50 text-red-600">
+                <Trash className={iconClass} strokeWidth={1.8} />
+              </span>
               <span>删除</span>
             </button>
           </div>
