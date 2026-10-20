@@ -258,23 +258,39 @@ export default function FavoritesPage() {
       <main className="mx-auto w-full max-w-[1000px] pl-2 pr-2 pt-3">
         <div className="flex gap-2">
           <aside className="sticky top-[56px] flex max-h-[calc(100dvh-64px)] w-[68px] shrink-0 flex-col gap-1 self-start overflow-y-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {filterOptions.map((p) => {
-              const active = filter === p.key;
+            <button
+              onClick={() => {
+                setTagFilter(null);
+                setAiIds(null);
+              }}
+              className={`relative shrink-0 rounded-lg px-1 py-2 text-left text-[13px] font-medium ${
+                tagFilter === null
+                  ? "bg-brand-soft font-semibold text-brand"
+                  : "text-muted"
+              }`}
+            >
+              {tagFilter === null && (
+                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand" />
+              )}
+              全部
+            </button>
+            {allTags.map((t) => {
+              const active = tagFilter === t;
               return (
                 <button
-                  key={p.key}
+                  key={t}
                   onClick={() => {
-                    setFilter(p.key);
+                    setTagFilter(tagFilter === t ? null : t);
                     setAiIds(null);
                   }}
-                  className={`relative shrink-0 rounded-lg px-1 py-2 text-left text-[13px] font-medium ${
+                  className={`relative shrink-0 truncate rounded-lg px-1 py-2 text-left text-[13px] font-medium ${
                     active ? "bg-brand-soft font-semibold text-brand" : "text-muted"
                   }`}
                 >
                   {active && (
                     <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand" />
                   )}
-                  {p.name}
+                  #{t}
                 </button>
               );
             })}
@@ -327,37 +343,27 @@ export default function FavoritesPage() {
                 </button>
               </div>
 
-              {allTags.length > 0 && (
+              {filterOptions.length > 1 && (
                 <div className="flex gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  <button
-                    onClick={() => {
-                      setTagFilter(null);
-                      setAiIds(null);
-                    }}
-                    className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
-                      tagFilter === null
-                        ? "bg-brand text-onbrand"
-                        : "bg-white text-muted ring-1 ring-sand"
-                    }`}
-                  >
-                    全部标签
-                  </button>
-                  {allTags.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => {
-                        setTagFilter(tagFilter === t ? null : t);
-                        setAiIds(null);
-                      }}
-                      className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
-                        tagFilter === t
-                          ? "bg-brand text-onbrand"
-                          : "bg-white text-muted ring-1 ring-sand"
-                      }`}
-                    >
-                      #{t}
-                    </button>
-                  ))}
+                  {filterOptions.map((p) => {
+                    const active = filter === p.key;
+                    return (
+                      <button
+                        key={p.key}
+                        onClick={() => {
+                          setFilter(p.key);
+                          setAiIds(null);
+                        }}
+                        className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
+                          active
+                            ? "bg-brand text-onbrand"
+                            : "bg-white text-muted ring-1 ring-sand"
+                        }`}
+                      >
+                        {p.key === "all" ? "全部平台" : p.name}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
