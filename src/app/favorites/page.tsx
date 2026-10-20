@@ -283,9 +283,6 @@ export default function FavoritesPage() {
                   : "text-muted"
               }`}
             >
-              {tagFilter === null && (
-                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand" />
-              )}
               全部
             </button>
             {allTags.map((t) => {
@@ -302,9 +299,6 @@ export default function FavoritesPage() {
                     active ? "bg-brand-soft font-semibold text-brand" : "text-muted"
                   }`}
                 >
-                  {active && (
-                    <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand" />
-                  )}
                   {t}
                 </button>
               );
