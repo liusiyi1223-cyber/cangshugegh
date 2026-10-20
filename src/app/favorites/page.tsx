@@ -235,7 +235,7 @@ export default function FavoritesPage() {
   }, [filtered, colCount]);
 
   return (
-    <div className="min-h-dvh bg-[#eef1f4] pb-[90px]" style={themeStyle}>
+    <div className="min-h-dvh bg-[#e9edf2] pb-[90px]" style={themeStyle}>
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-sand bg-white px-4">
         <div className="flex items-center gap-2.5">
           <button
@@ -312,7 +312,7 @@ export default function FavoritesPage() {
           </aside>
 
           <div className="min-w-0 flex-1">
-            <div className="sticky top-[56px] z-20 mb-2 flex flex-col gap-2 bg-[#eef1f4] pb-2">
+            <div className="sticky top-[56px] z-20 mb-2 flex flex-col gap-2 bg-[#e9edf2] pb-2">
               {filterOptions.length > 1 && (
                 <div className="flex gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {filterOptions.map((p) => {
