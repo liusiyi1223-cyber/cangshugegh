@@ -86,7 +86,7 @@ export default function FavoriteActionSheet({
   const rowClass =
     "flex h-12 w-full items-center gap-3 px-4 text-left text-[15px] text-ink active:bg-sand";
   const iconWrap =
-    "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand";
+    "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#f3f4f6] text-ink";
   const iconClass = "h-4 w-4";
 
   return (

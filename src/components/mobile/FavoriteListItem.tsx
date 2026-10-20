@@ -101,7 +101,7 @@ function FavoriteListItem({
           {tags.slice(0, 1).map((t) => (
             <span
               key={t}
-              className="shrink-0 rounded bg-brand-soft px-1.5 py-0.5 text-[9px] text-brand-dark"
+              className="shrink-0 rounded bg-brand-soft px-1.5 py-0.5 text-[9px] text-ink"
             >
               #{t}
             </span>
