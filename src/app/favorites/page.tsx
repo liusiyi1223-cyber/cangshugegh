@@ -322,7 +322,7 @@ export default function FavoritesPage() {
                         className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
                           active
                             ? "bg-brand text-onbrand"
-                            : "bg-white text-muted ring-1 ring-sand"
+                            : "text-muted"
                         }`}
                       >
                         {p.key === "all" ? "全部平台" : p.name}
