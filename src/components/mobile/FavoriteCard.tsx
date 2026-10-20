@@ -102,7 +102,7 @@ function FavoriteCard({
         {tags.slice(0, 2).map((t) => (
           <span
             key={t}
-            className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-brand-dark"
+            className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-ink"
           >
             #{t}
           </span>
