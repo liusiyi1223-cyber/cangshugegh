@@ -25,6 +25,15 @@ const THEME_COLORS = [
   { key: "white", name: "白色", value: "#ffffff" },
 ];
 
+function searchPlaceholder(tagFilter: string | null, filter: string): string {
+  const parts = ["标题"];
+  if (!tagFilter) parts.push("标签");
+  if (filter === "all") parts.push("平台");
+  if (parts.length === 1) return "搜索标题…";
+  const head = parts.slice(0, -1).join("、");
+  return `搜索${head}或${parts[parts.length - 1]}…`;
+}
+
 export default function FavoritesPage() {
   const [items, setItems] = useState<FavoriteWithCollections[]>([]);
   const [filter, setFilter] = useState("all");
@@ -326,7 +335,7 @@ export default function FavoritesPage() {
                 <Search size={17} strokeWidth={1.8} />
                 <input
                   id="searchbox"
-                  placeholder="搜索标题、标签或平台…"
+                  placeholder={searchPlaceholder(tagFilter, filter)}
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
