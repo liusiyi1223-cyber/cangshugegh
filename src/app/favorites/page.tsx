@@ -302,9 +302,7 @@ export default function FavoritesPage() {
                 <Search size={17} strokeWidth={1.8} />
                 <input
                   id="searchbox"
-                  placeholder={
-                    filter === "all" ? "搜索标题、平台或标签…" : "搜索标题或标签…"
-                  }
+                  placeholder="搜索标题、标签或平台…"
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
