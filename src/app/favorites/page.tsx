@@ -236,18 +236,18 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-dvh bg-background pb-[90px]" style={themeStyle}>
-      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-sand bg-white px-4">
+      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-sand bg-brand px-4">
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="菜单"
-            className="grid h-9 w-9 place-items-center rounded-xl text-ink hover:bg-brand-soft"
+            className="grid h-9 w-9 place-items-center rounded-xl text-onbrand hover:bg-white/10"
           >
             <Menu size={20} strokeWidth={1.8} />
           </button>
           <div className="leading-tight">
-            <h1 className="text-base font-bold tracking-tight text-ink">收藏</h1>
-            <p className="text-[11px] text-muted">{items.length} 条收藏</p>
+            <h1 className="text-base font-bold tracking-tight text-onbrand">收藏</h1>
+            <p className="text-[11px] text-onbrand opacity-70">{items.length} 条收藏</p>
           </div>
         </div>
         <a

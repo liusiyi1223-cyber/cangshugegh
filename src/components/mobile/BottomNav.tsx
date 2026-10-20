@@ -24,11 +24,11 @@ function TabItem({
       href={href}
       replace
       className={`relative flex flex-1 flex-col items-center justify-center py-2 ${
-        active ? "text-brand" : "text-muted"
+        active ? "text-onbrand" : "text-onbrand opacity-70"
       }`}
     >
       {active && (
-        <span className="absolute top-0 h-0.5 w-8 rounded-full bg-brand" />
+        <span className="absolute top-0 h-0.5 w-8 rounded-full bg-onbrand" />
       )}
       <Icon className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} />
     </Link>
@@ -41,7 +41,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-sand bg-white"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-sand bg-brand"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="mx-auto flex w-full max-w-[1000px] items-end">
@@ -57,7 +57,7 @@ export default function BottomNav() {
           <button
             onClick={() => setAddOpen(true)}
             aria-label="添加收藏"
-            className="grid h-11 w-11 place-items-center rounded-full bg-brand text-white shadow-lg shadow-brand/30"
+            className="grid h-11 w-11 place-items-center rounded-full bg-onbrand text-brand shadow-lg shadow-black/20"
           >
             <Plus size={20} strokeWidth={2.2} />
           </button>
