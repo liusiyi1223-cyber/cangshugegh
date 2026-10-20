@@ -175,15 +175,15 @@ export default function MePage() {
 
   return (
     <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]" style={themeStyle}>
-      <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-sand bg-white px-4 py-3">
+      <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-sand bg-brand px-4 py-3">
         <button
           onClick={() => router.back()}
           aria-label="返回"
-          className="grid h-9 w-9 place-items-center rounded-lg text-ink hover:bg-brand-soft"
+          className="grid h-9 w-9 place-items-center rounded-lg text-onbrand hover:bg-white/10"
         >
           <ArrowLeft size={22} strokeWidth={1.8} />
         </button>
-        <h1 className="text-lg font-bold tracking-tight text-ink">我的</h1>
+        <h1 className="text-lg font-bold tracking-tight text-onbrand">我的</h1>
       </header>
 
       <main className="px-4 pt-3">

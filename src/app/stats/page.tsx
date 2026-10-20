@@ -40,9 +40,9 @@ export default function StatsPage() {
 
   return (
     <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]" style={themeStyle}>
-      <header className="sticky top-0 z-30 border-b border-sand bg-white px-4 pb-3 pt-4">
-        <h1 className="text-lg font-bold tracking-tight text-ink">统计</h1>
-        <p className="mt-1 text-xs text-muted">查看各平台链接抓取情况</p>
+      <header className="sticky top-0 z-30 border-b border-sand bg-brand px-4 pb-3 pt-4">
+        <h1 className="text-lg font-bold tracking-tight text-onbrand">统计</h1>
+        <p className="mt-1 text-xs text-onbrand opacity-70">查看各平台链接抓取情况</p>
       </header>
 
       <main className="px-4 pt-4">
