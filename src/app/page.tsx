@@ -27,15 +27,15 @@ export default function WelcomePage() {
     <main className="flex min-h-dvh flex-col bg-background px-6">
       <div className="flex flex-1 flex-col items-center justify-center py-12">
         <div className="relative">
-          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-[#6b7280] text-white shadow-lg">
+          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-[#78716c] text-white shadow-lg">
             <Cloud size={40} strokeWidth={1.5} />
           </div>
-          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl bg-[#4b5563] text-white">
+          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl bg-[#57534e] text-white">
             <Bookmark size={16} strokeWidth={2} />
           </div>
         </div>
 
-        <h1 className="mt-7 text-3xl font-bold tracking-tight text-[#4b5563]">
+        <h1 className="mt-7 text-3xl font-bold tracking-tight text-[#57534e]">
           我的云收藏夹
         </h1>
         <p className="mt-2.5 text-sm text-muted">
@@ -63,7 +63,7 @@ export default function WelcomePage() {
       <div className="mx-auto w-full max-w-sm pb-10">
         <a
           href="/login"
-          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-[#6b7280] text-[15px] font-semibold text-white shadow-lg"
+          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-[#78716c] text-[15px] font-semibold text-white shadow-lg"
         >
           登录
         </a>
@@ -72,7 +72,7 @@ export default function WelcomePage() {
             href="/register"
             className="text-sm text-muted"
           >
-            没有账号？<span className="text-[#4b5563] font-medium">注册</span>
+            没有账号？<span className="text-[#57534e] font-medium">注册</span>
           </a>
         </div>
       </div>
