@@ -301,7 +301,7 @@ export default function FavoritesPage() {
                   {active && (
                     <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-brand" />
                   )}
-                  #{t}
+                  {t}
                 </button>
               );
             })}
