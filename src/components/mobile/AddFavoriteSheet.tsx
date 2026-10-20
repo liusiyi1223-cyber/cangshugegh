@@ -251,7 +251,7 @@ export default function AddFavoriteSheet({
         type="button"
         onClick={handleParse}
         disabled={loading || !text.trim()}
-        className="mt-3 w-full rounded-xl bg-gradient-to-r from-[#1b3a63] to-[#4f7df9] py-3 text-base font-medium text-white shadow-md shadow-[#1b3a63]/25 transition disabled:opacity-50"
+        className="mt-3 w-full rounded-xl bg-brand py-3 text-base font-medium text-onbrand ring-1 ring-sand transition disabled:opacity-50"
       >
         {loading ? "解析中…" : "解析并保存"}
       </button>
