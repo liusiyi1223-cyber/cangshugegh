@@ -178,7 +178,7 @@ export default function AddFavoriteSheet({
         placeholder="粘贴分享文本或链接…"
         autoFocus
         rows={3}
-        className="w-full resize-none rounded-xl bg-cream p-3 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        className="w-full resize-none rounded-xl bg-cream p-3 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
 
       <textarea
@@ -187,7 +187,7 @@ export default function AddFavoriteSheet({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="标题（自动识别，可修改）"
         rows={1}
-        className="mt-2 w-full resize-none overflow-hidden rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        className="mt-2 w-full resize-none overflow-hidden rounded-xl bg-cream px-3 py-2.5 text-xs text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
 
       {userTags.length > 0 && (
@@ -199,7 +199,7 @@ export default function AddFavoriteSheet({
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`rounded-full px-2.5 py-1 text-xs ${
+                className={`rounded-full px-2.5 py-1 text-[11px] ${
                   selected ? "bg-brand text-onbrand" : "bg-brand-soft text-ink"
                 }`}
               >
@@ -214,7 +214,7 @@ export default function AddFavoriteSheet({
         value={tagInput}
         onChange={(e) => setTagInput(e.target.value)}
         placeholder="新建标签（逗号分隔）"
-        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-xs text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
@@ -222,7 +222,7 @@ export default function AddFavoriteSheet({
           type="button"
           onClick={requestAiTags}
           disabled={aiLoading || !title.trim()}
-          className="rounded-full bg-brand-soft px-2.5 py-1 text-xs text-ink ring-1 ring-sand disabled:opacity-50"
+          className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] text-ink ring-1 ring-sand disabled:opacity-50"
         >
           {aiLoading ? "推荐中…" : "AI 推荐标签"}
         </button>
@@ -233,7 +233,7 @@ export default function AddFavoriteSheet({
               key={tag}
               type="button"
               onClick={() => toggleTag(tag)}
-              className={`rounded-full px-2.5 py-1 text-xs ${
+              className={`rounded-full px-2.5 py-1 text-[11px] ${
                 selected ? "bg-brand text-onbrand" : "bg-tag text-muted"
               }`}
             >
@@ -244,11 +244,11 @@ export default function AddFavoriteSheet({
       </div>
 
       <div className="mt-2.5 flex items-center gap-2">
-        <span className="shrink-0 text-xs text-muted">平台</span>
+        <span className="shrink-0 text-[11px] text-muted">平台</span>
         <select
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
-          className="min-w-0 flex-1 rounded-xl bg-white px-3 py-2.5 text-sm text-ink ring-1 ring-sand focus:outline-none focus:ring-brand"
+          className="min-w-0 flex-1 rounded-xl bg-white px-3 py-2.5 text-xs text-ink ring-1 ring-sand focus:outline-none focus:ring-brand"
         >
           <option value="other">其他 / 自动识别</option>
           {PLATFORMS.map((p) => (
@@ -261,34 +261,34 @@ export default function AddFavoriteSheet({
           type="button"
           onClick={handleParse}
           disabled={loading || !text.trim()}
-          className="shrink-0 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-onbrand ring-1 ring-sand transition disabled:opacity-50"
+          className="shrink-0 rounded-xl bg-brand px-4 py-2.5 text-xs font-medium text-onbrand ring-1 ring-sand transition disabled:opacity-50"
         >
           {loading ? "解析中…" : "解析并保存"}
         </button>
       </div>
 
-      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+      {error && <p className="mt-3 text-xs text-danger">{error}</p>}
 
       {showManual && (
         <div className="mt-4 rounded-xl bg-cream p-3 ring-1 ring-sand">
-          <p className="text-sm font-medium text-ink">手动添加</p>
+          <p className="text-xs font-medium text-ink">手动添加</p>
           <input
             value={manualUrl}
             onChange={(e) => setManualUrl(e.target.value)}
             placeholder="链接 *"
-            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
           />
           <input
             value={manualTitle}
             onChange={(e) => setManualTitle(e.target.value)}
             placeholder="标题 *"
-            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
           />
           <button
             type="button"
             onClick={handleManual}
             disabled={loading}
-            className="mt-3 w-full rounded-xl bg-white py-2.5 text-sm font-medium text-ink ring-1 ring-sand transition disabled:opacity-50"
+            className="mt-3 w-full rounded-xl bg-white py-2.5 text-xs font-medium text-ink ring-1 ring-sand transition disabled:opacity-50"
           >
             {loading ? "保存中…" : "手动保存"}
           </button>
