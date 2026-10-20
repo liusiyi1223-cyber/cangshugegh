@@ -21,14 +21,15 @@ export function useThemeColor(defaultColor = "#1b3a63") {
     readStoredTheme(defaultColor)
   );
 
-  // 后台同步服务器主题色（跨设备 / 首次登录），仅在变化时更新
+  // 仅在本地无缓存（首次/清缓存后）才同步服务器，避免每次导航都多一次请求
   useEffect(() => {
+    if (readStoredTheme(defaultColor) !== defaultColor) return;
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((u) => {
         const pref = (u?.preferences as { themeColor?: string } | null)
           ?.themeColor;
-        if (pref && pref !== readStoredTheme(defaultColor)) {
+        if (pref) {
           setThemeColorState(pref);
           try {
             localStorage.setItem(THEME_KEY, pref);
