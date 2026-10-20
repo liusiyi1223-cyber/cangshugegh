@@ -25,8 +25,6 @@ const THEME_COLORS = [
   { key: "white", name: "白色", value: "#ffffff" },
 ];
 
-const FILTER_OPTIONS = [{ key: "all", name: "全部" }, ...PLATFORMS];
-
 export default function FavoritesPage() {
   const [items, setItems] = useState<FavoriteWithCollections[]>([]);
   const [filter, setFilter] = useState("all");
@@ -186,6 +184,17 @@ export default function FavoritesPage() {
     return [...set];
   }, [items]);
 
+  const filterOptions = useMemo(() => {
+    const used = new Set(items.map((it) => it.platform).filter(Boolean));
+    return [{ key: "all", name: "全部" }, ...PLATFORMS.filter((p) => used.has(p.key))];
+  }, [items]);
+
+  useEffect(() => {
+    if (filter !== "all" && !filterOptions.some((p) => p.key === filter)) {
+      setFilter("all");
+    }
+  }, [filter, filterOptions]);
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const update = () => setColCount(mq.matches ? 3 : 2);
@@ -249,7 +258,7 @@ export default function FavoritesPage() {
       <main className="mx-auto w-full max-w-[1000px] pl-2 pr-2 pt-3">
         <div className="flex gap-2">
           <aside className="sticky top-[56px] flex max-h-[calc(100dvh-64px)] w-[68px] shrink-0 flex-col gap-1 self-start overflow-y-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {FILTER_OPTIONS.map((p) => {
+            {filterOptions.map((p) => {
               const active = filter === p.key;
               return (
                 <button
