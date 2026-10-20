@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { extractTitle, extractUrls } from "@/lib/extract";
 import { PLATFORMS, detectPlatform } from "@/lib/platforms";
@@ -34,6 +34,7 @@ export default function AddFavoriteSheet({
   const [aiTags, setAiTags] = useState<string[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiIcon, setAiIcon] = useState<string | null>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -51,6 +52,14 @@ export default function AddFavoriteSheet({
       .then((r) => (r.ok ? r.json() : null))
       .then((u) => setUserTags(u?.tags ?? []));
   }, [open]);
+
+  useEffect(() => {
+    const el = titleRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [title]);
 
   function toggleTag(tag: string) {
     const tags = parseTags(tagInput);
@@ -172,11 +181,13 @@ export default function AddFavoriteSheet({
         className="w-full resize-none rounded-xl bg-cream p-3 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
 
-      <input
+      <textarea
+        ref={titleRef}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="标题（自动识别，可修改）"
-        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        rows={1}
+        className="mt-2 w-full resize-none overflow-hidden rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
 
       {userTags.length > 0 && (
@@ -237,7 +248,7 @@ export default function AddFavoriteSheet({
         <select
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
-          className="flex-1 rounded-xl bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand focus:outline-none focus:ring-brand"
+          className="min-w-0 flex-1 rounded-xl bg-white px-3 py-2.5 text-sm text-ink ring-1 ring-sand focus:outline-none focus:ring-brand"
         >
           <option value="other">其他 / 自动识别</option>
           {PLATFORMS.map((p) => (
@@ -246,16 +257,15 @@ export default function AddFavoriteSheet({
             </option>
           ))}
         </select>
+        <button
+          type="button"
+          onClick={handleParse}
+          disabled={loading || !text.trim()}
+          className="shrink-0 rounded-xl bg-brand px-4 py-2.5 text-sm font-medium text-onbrand ring-1 ring-sand transition disabled:opacity-50"
+        >
+          {loading ? "解析中…" : "解析并保存"}
+        </button>
       </div>
-
-      <button
-        type="button"
-        onClick={handleParse}
-        disabled={loading || !text.trim()}
-        className="mt-3 w-full rounded-xl bg-brand py-3 text-base font-medium text-onbrand ring-1 ring-sand transition disabled:opacity-50"
-      >
-        {loading ? "解析中…" : "解析并保存"}
-      </button>
 
       {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
