@@ -101,13 +101,16 @@ export default function WorkbenchPage() {
   }
 
   function exportMarkdown() {
-    const lines = favorites.map((f) => {
-      const platform = platformName(f.platform);
-      const tags = (f.tags ?? []).map((t) => `#${t}`).join(" ");
-      const time = new Date(f.createdAt).toLocaleDateString("zh-CN");
-      return `- [${f.title}](${f.url}) · ${platform} · ${time} ${tags}`;
+    const sections = groupedByDate.map(({ date, items }) => {
+      const lines = items.map((f) => {
+        const platform = platformName(f.platform);
+        const tags = (f.tags ?? []).map((t) => `#${t}`).join(" ");
+        const suffix = tags ? ` · ${tags}` : "";
+        return `- [${f.title}](${f.url}) · ${platform}${suffix}`;
+      });
+      return `## ${date}\n\n${lines.join("\n")}`;
     });
-    const content = `# 我的收藏备份\n\n共 ${favorites.length} 条\n\n${lines.join("\n")}\n`;
+    const content = `# 我的收藏备份\n\n共 ${favorites.length} 条\n\n${sections.join("\n\n")}\n`;
     download(`收藏备份_${new Date().toISOString().slice(0, 10)}.md`, content);
   }
 
