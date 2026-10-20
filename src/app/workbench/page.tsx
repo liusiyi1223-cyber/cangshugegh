@@ -392,7 +392,7 @@ export default function WorkbenchPage() {
                     key={tag}
                     className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-[13px] text-brand-dark"
                   >
-                    #{tag}
+                    {tag}
                     <span className="text-[11px] text-muted">
                       {tagCounts.get(tag) ?? 0}
                     </span>
