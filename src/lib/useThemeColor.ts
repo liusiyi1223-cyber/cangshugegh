@@ -6,6 +6,9 @@ import { darken, mixWhite, readableOn } from "./color";
 
 const THEME_KEY = "themeColor";
 
+// 会话级缓存：首次同步到主题色后记在内存，后续导航直接复用，避免闪屏
+let cachedTheme: string | null = null;
+
 function readStoredTheme(defaultColor: string): string {
   if (typeof window === "undefined") return defaultColor;
   try {
@@ -16,19 +19,21 @@ function readStoredTheme(defaultColor: string): string {
 }
 
 export function useThemeColor(defaultColor = "#1b3a63") {
-  // 初始值直接读 localStorage，避免每次导航闪回默认色
-  const [themeColor, setThemeColorState] = useState(() =>
-    readStoredTheme(defaultColor)
-  );
+  const [themeColor, setThemeColorState] = useState(() => {
+    if (cachedTheme) return cachedTheme;
+    cachedTheme = readStoredTheme(defaultColor);
+    return cachedTheme;
+  });
 
-  // 后台从服务器同步一次，以服务器为准，避免本地缓存过期导致颜色不一致
+  // 后台从服务器同步一次，以服务器为准，避免本地缓存过期
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((u) => {
         const pref = (u?.preferences as { themeColor?: string } | null)
           ?.themeColor;
-        if (pref && pref !== themeColor) {
+        if (pref && pref !== cachedTheme) {
+          cachedTheme = pref;
           setThemeColorState(pref);
           try {
             localStorage.setItem(THEME_KEY, pref);
@@ -40,6 +45,7 @@ export function useThemeColor(defaultColor = "#1b3a63") {
   }, [defaultColor]);
 
   function setThemeColor(value: string) {
+    cachedTheme = value;
     setThemeColorState(value);
     try {
       localStorage.setItem(THEME_KEY, value);
