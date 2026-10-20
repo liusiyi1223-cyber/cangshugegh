@@ -241,7 +241,7 @@ export default function FavoritesPage() {
             <Menu size={20} strokeWidth={1.8} />
           </button>
           <div className="leading-tight">
-            <h1 className="text-base font-bold tracking-tight text-onbrand">口袋</h1>
+            <h1 className="text-base font-bold tracking-tight text-onbrand">我的口袋</h1>
             <p className="text-[11px] text-onbrand opacity-70">{items.length} 条收藏</p>
           </div>
         </div>
