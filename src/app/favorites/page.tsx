@@ -298,6 +298,30 @@ export default function FavoritesPage() {
 
           <div className="min-w-0 flex-1">
             <div className="sticky top-[56px] z-20 mb-2 flex flex-col gap-2 bg-background pb-2">
+              {filterOptions.length > 1 && (
+                <div className="flex gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {filterOptions.map((p) => {
+                    const active = filter === p.key;
+                    return (
+                      <button
+                        key={p.key}
+                        onClick={() => {
+                          setFilter(p.key);
+                          setAiIds(null);
+                        }}
+                        className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
+                          active
+                            ? "bg-brand text-onbrand"
+                            : "bg-white text-muted ring-1 ring-sand"
+                        }`}
+                      >
+                        {p.key === "all" ? "全部平台" : p.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <div className="flex h-9 items-center gap-2 rounded-xl bg-cream px-3 text-muted focus-within:ring-1 focus-within:ring-brand">
                 <Search size={17} strokeWidth={1.8} />
                 <input
@@ -340,30 +364,6 @@ export default function FavoritesPage() {
                   )}
                 </button>
               </div>
-
-              {filterOptions.length > 1 && (
-                <div className="flex gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {filterOptions.map((p) => {
-                    const active = filter === p.key;
-                    return (
-                      <button
-                        key={p.key}
-                        onClick={() => {
-                          setFilter(p.key);
-                          setAiIds(null);
-                        }}
-                        className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
-                          active
-                            ? "bg-brand text-onbrand"
-                            : "bg-white text-muted ring-1 ring-sand"
-                        }`}
-                      >
-                        {p.key === "all" ? "全部平台" : p.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
 
             <div>
