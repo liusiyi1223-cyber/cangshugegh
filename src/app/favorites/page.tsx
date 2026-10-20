@@ -186,11 +186,15 @@ export default function FavoritesPage() {
   }, [items, query, filter, tagFilter, aiIds]);
 
   const allTags = useMemo(() => {
-    const set = new Set<string>();
+    const counts = new Map<string, number>();
     for (const it of items) {
-      for (const t of it.tags ?? []) set.add(t);
+      for (const t of it.tags ?? []) {
+        counts.set(t, (counts.get(t) ?? 0) + 1);
+      }
     }
-    return [...set];
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([t]) => t);
   }, [items]);
 
   const filterOptions = useMemo(() => {
