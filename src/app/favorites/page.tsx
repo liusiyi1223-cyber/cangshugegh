@@ -410,7 +410,7 @@ export default function FavoritesPage() {
             {columns.map((col, ci) => (
               <div key={ci} className="flex min-w-0 flex-1 flex-col gap-1">
                 {col.map((f) => (
-                  <FavoriteCard key={f.id} favorite={f} onOpen={setActiveFavorite} hide={hide} />
+                  <FavoriteCard key={f.id} favorite={f} onOpen={setActiveFavorite} hide={hide} dense={colCount === 3} />
                 ))}
               </div>
             ))}

@@ -92,7 +92,7 @@ function FavoriteListItem({
         <div className="mt-auto flex items-center gap-1.5 pt-1.5">
           {favorite.platform && (
             <span
-              className="shrink-0 rounded px-1 py-0.5 text-[8px] text-white"
+              className="shrink-0 rounded px-1 py-0.5 text-[7px] text-white"
               style={{ backgroundColor: platformColor(favorite.platform) }}
             >
               {platformName(favorite.platform)}
@@ -101,7 +101,7 @@ function FavoriteListItem({
           {tags.slice(0, 1).map((t) => (
             <span
               key={t}
-              className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-ink"
+              className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[7px] text-ink"
             >
               #{t}
             </span>

@@ -11,10 +11,12 @@ function FavoriteCard({
   favorite,
   onOpen,
   hide,
+  dense,
 }: {
   favorite: FavoriteWithCollections;
   onOpen: (f: FavoriteWithCollections) => void;
   hide: boolean;
+  dense?: boolean;
 }) {
   const broken = favorite.status === "BROKEN";
   const tags = favorite.tags ?? [];
@@ -93,7 +95,7 @@ function FavoriteCard({
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-[#e5e7eb] bg-[#f3f4f6] px-3 py-2">
         {favorite.platform && (
           <span
-            className="shrink-0 rounded px-1 py-0.5 text-[8px] text-white"
+            className={`shrink-0 rounded px-1 py-0.5 ${dense ? "text-[7px]" : "text-[8px]"} text-white`}
             style={{ backgroundColor: platformColor(favorite.platform) }}
           >
             {platformName(favorite.platform)}
@@ -102,7 +104,7 @@ function FavoriteCard({
         {tags.slice(0, 2).map((t) => (
           <span
             key={t}
-            className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-ink"
+            className={`shrink-0 rounded bg-brand-soft px-1 py-0.5 ${dense ? "text-[7px]" : "text-[8px]"} text-ink`}
           >
             #{t}
           </span>
