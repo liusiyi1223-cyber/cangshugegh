@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, LayoutGrid, List, Menu, Palette, Search, Sparkles, UserRound, X } from "lucide-react";
+import { Bookmark, Columns2, Columns3, List, Menu, Palette, Search, Sparkles, UserRound, X } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
 import { PLATFORMS, platformName } from "@/lib/platforms";
 import { extractDominantColors } from "@/lib/image";
@@ -45,8 +45,8 @@ export default function FavoritesPage() {
   const { themeColor, setThemeColor, themeStyle } = useThemeColor();
   const { hide } = useHideVisitCount();
   const [avatarColors, setAvatarColors] = useState<string[]>([]);
-  const colCount = 3;
-  const [layout, setLayout] = useState<"masonry" | "list">("masonry");
+  const [layout, setLayout] = useState<"masonry3" | "masonry2" | "list">("masonry3");
+  const colCount = layout === "masonry2" ? 2 : 3;
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
     null
   );
@@ -116,14 +116,17 @@ export default function FavoritesPage() {
       .then((r) => (r.ok ? r.json() : null))
       .then((u) => {
         const pref = (u?.preferences as { layout?: string } | null)?.layout;
-        if (pref === "list" || pref === "masonry") setLayout(pref);
+        if (pref === "list" || pref === "masonry2" || pref === "masonry3") setLayout(pref);
+        else if (pref === "masonry") setLayout("masonry3");
       })
       .catch(() => {});
   }, []);
 
   function toggleLayout() {
     setLayout((prev) => {
-      const next = prev === "masonry" ? "list" : "masonry";
+      const order: ("masonry3" | "masonry2" | "list")[] = ["masonry3", "masonry2", "list"];
+      const idx = order.indexOf(prev);
+      const next = order[(idx + 1) % order.length];
       fetch("/api/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -359,10 +362,12 @@ export default function FavoritesPage() {
                   aria-label="切换排列方式"
                   className="shrink-0 text-muted"
                 >
-                  {layout === "masonry" ? (
+                  {layout === "list" ? (
                     <List size={17} strokeWidth={1.8} />
+                  ) : layout === "masonry2" ? (
+                    <Columns2 size={17} strokeWidth={1.8} />
                   ) : (
-                    <LayoutGrid size={17} strokeWidth={1.8} />
+                    <Columns3 size={17} strokeWidth={1.8} />
                   )}
                 </button>
               </div>
@@ -370,7 +375,7 @@ export default function FavoritesPage() {
 
             <div>
             {loading ? (
-          <div className="grid grid-cols-3 gap-2">
+          <div className={`grid gap-2 ${colCount === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
