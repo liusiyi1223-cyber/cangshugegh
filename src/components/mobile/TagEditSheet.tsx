@@ -100,7 +100,7 @@ export default function TagEditSheet({
           {tags.map((t) => (
             <span
               key={t}
-              className="flex items-center gap-1.5 rounded-full bg-[#f3f4f6] px-3 py-1.5 text-sm text-ink"
+              className="flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-sm text-ink"
             >
               {t}
               <button
@@ -153,7 +153,7 @@ export default function TagEditSheet({
             addTag(input);
             setInput("");
           }}
-          className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-white"
+          className="shrink-0 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-onbrand"
         >
           添加
         </button>
@@ -163,7 +163,7 @@ export default function TagEditSheet({
         type="button"
         onClick={save}
         disabled={saving}
-        className="mt-4 w-full rounded-full bg-ink py-3 text-base font-medium text-white transition disabled:opacity-50"
+        className="mt-4 w-full rounded-full bg-brand py-3 text-base font-medium text-onbrand transition disabled:opacity-50"
       >
         {saving ? "保存中…" : "保存"}
       </button>
