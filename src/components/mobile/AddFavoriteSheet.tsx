@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { extractTitle, extractUrls } from "@/lib/extract";
 import { PLATFORMS, detectPlatform } from "@/lib/platforms";
@@ -34,7 +34,6 @@ export default function AddFavoriteSheet({
   const [aiTags, setAiTags] = useState<string[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiIcon, setAiIcon] = useState<string | null>(null);
-  const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -131,6 +130,28 @@ export default function AddFavoriteSheet({
     }
   }
 
+  async function requestAiTags() {
+    const t = title.trim();
+    if (!t || aiLoading) return;
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/ai/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: t }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAiTags(data.tags ?? []);
+        if (data.icon) setAiIcon(data.icon);
+      }
+    } catch {
+      // AI 失败静默忽略
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   return (
     <BottomSheet open={open} onClose={onClose} title="添加收藏" variant="center">
       <textarea
@@ -143,28 +164,6 @@ export default function AddFavoriteSheet({
           if (urls.length > 0) {
             const detected = detectPlatform(urls[0]);
             if (detected) setPlatform(detected);
-          }
-          if (aiTimerRef.current) clearTimeout(aiTimerRef.current);
-          if (t.trim()) {
-            aiTimerRef.current = setTimeout(async () => {
-              setAiLoading(true);
-              try {
-                const res = await fetch("/api/ai/tags", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ title: t.trim() }),
-                });
-                if (res.ok) {
-                  const data = await res.json();
-                  setAiTags(data.tags ?? []);
-                  if (data.icon) setAiIcon(data.icon);
-                }
-              } catch {
-                // AI 失败静默忽略
-              } finally {
-                setAiLoading(false);
-              }
-            }, 400);
           }
         }}
         placeholder="粘贴分享文本或链接…"
@@ -207,29 +206,31 @@ export default function AddFavoriteSheet({
         className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
       />
 
-      {(aiTags.length > 0 || aiLoading) && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-muted">AI 推荐</span>
-          {aiLoading && aiTags.length === 0 && (
-            <span className="text-xs text-muted">加载中…</span>
-          )}
-          {aiTags.map((tag) => {
-            const selected = parseTags(tagInput).includes(tag);
-            return (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => toggleTag(tag)}
-                className={`rounded-full px-2.5 py-1 text-xs ${
-                  selected ? "bg-brand text-onbrand" : "bg-tag text-muted"
-                }`}
-              >
-                #{tag}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={requestAiTags}
+          disabled={aiLoading || !title.trim()}
+          className="rounded-full bg-brand-soft px-2.5 py-1 text-xs text-ink ring-1 ring-sand disabled:opacity-50"
+        >
+          {aiLoading ? "推荐中…" : "AI 推荐标签"}
+        </button>
+        {aiTags.map((tag) => {
+          const selected = parseTags(tagInput).includes(tag);
+          return (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => toggleTag(tag)}
+              className={`rounded-full px-2.5 py-1 text-xs ${
+                selected ? "bg-brand text-onbrand" : "bg-tag text-muted"
+              }`}
+            >
+              #{tag}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="mt-2.5 flex items-center gap-2">
         <span className="shrink-0 text-xs text-muted">平台</span>
