@@ -75,7 +75,7 @@ function FavoriteCard({
       </button>
 
       <div className="px-3 pt-3">
-        <div className="text-[13px] font-medium leading-snug text-ink">
+        <div className={`${dense ? "text-[12px]" : "text-[13px]"} font-medium leading-snug text-ink`}>
           <button
             type="button"
             onClick={() => onOpen(favorite)}
