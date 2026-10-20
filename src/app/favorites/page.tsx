@@ -270,6 +270,7 @@ export default function FavoritesPage() {
             <button
               onClick={() => {
                 setTagFilter(null);
+                setQuery("");
                 setAiIds(null);
               }}
               className={`relative shrink-0 rounded-lg px-1 py-2 text-left text-[13px] font-medium ${
@@ -290,6 +291,7 @@ export default function FavoritesPage() {
                   key={t}
                   onClick={() => {
                     setTagFilter(tagFilter === t ? null : t);
+                    setQuery("");
                     setAiIds(null);
                   }}
                   className={`relative shrink-0 truncate rounded-lg px-1 py-2 text-left text-[13px] font-medium ${
@@ -316,6 +318,7 @@ export default function FavoritesPage() {
                         key={p.key}
                         onClick={() => {
                           setFilter(p.key);
+                          setQuery("");
                           setAiIds(null);
                         }}
                         className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${
