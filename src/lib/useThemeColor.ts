@@ -16,14 +16,13 @@ function readStoredTheme(defaultColor: string): string {
 }
 
 export function useThemeColor(defaultColor = "#1b3a63") {
-  const [themeColor, setThemeColorState] = useState(defaultColor);
+  // 初始值直接读 localStorage，避免每次导航闪回默认色
+  const [themeColor, setThemeColorState] = useState(() =>
+    readStoredTheme(defaultColor)
+  );
 
+  // 后台从服务器同步一次，以服务器为准，避免本地缓存过期导致颜色不一致
   useEffect(() => {
-    // 先用本地缓存立即上色，避免闪回默认色
-    const stored = readStoredTheme(defaultColor);
-    if (stored !== defaultColor) setThemeColorState(stored);
-
-    // 再从服务器同步一次，以服务器为准，避免本地缓存过期导致颜色不一致
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((u) => {
