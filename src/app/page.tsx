@@ -27,10 +27,10 @@ export default function WelcomePage() {
     <main className="flex min-h-dvh flex-col bg-background px-6">
       <div className="flex flex-1 flex-col items-center justify-center py-12">
         <div className="relative">
-          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-[#78716c] text-white shadow-lg">
+          <div className="grid h-20 w-20 place-items-center rounded-3xl border border-[#a8a29e] text-[#57534e]">
             <Cloud size={40} strokeWidth={1.5} />
           </div>
-          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl bg-[#57534e] text-white">
+          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl border border-[#a8a29e] bg-white text-[#57534e]">
             <Bookmark size={16} strokeWidth={2} />
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function WelcomePage() {
       <div className="mx-auto w-full max-w-sm pb-10">
         <a
           href="/login"
-          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-[#78716c] text-[15px] font-semibold text-white shadow-lg"
+          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-[#a8a29e] text-[15px] font-semibold text-[#57534e]"
         >
           登录
         </a>
