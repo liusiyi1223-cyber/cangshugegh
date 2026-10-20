@@ -110,7 +110,7 @@ export default function FavoriteActionSheet({
   const rowClass =
     "flex h-12 w-full items-center gap-3 px-4 text-left text-[15px] text-ink active:bg-sand";
   const iconWrap =
-    "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-ink";
+    "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-ink ring-1 ring-sand";
   const iconClass = "h-4 w-4";
 
   return (
@@ -246,7 +246,7 @@ export default function FavoriteActionSheet({
         <button
           onClick={saveNote}
           disabled={noteBusy}
-          className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-onbrand disabled:opacity-55"
+          className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-onbrand ring-1 ring-sand disabled:opacity-55"
         >
           {noteBusy ? "保存中…" : "保存"}
         </button>
