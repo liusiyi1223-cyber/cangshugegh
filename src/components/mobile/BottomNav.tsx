@@ -59,7 +59,7 @@ export default function BottomNav() {
             aria-label="添加收藏"
             className="grid h-11 w-11 place-items-center text-onbrand"
           >
-            <Plus size={26} strokeWidth={2.2} />
+            <Plus size={34} strokeWidth={2.2} />
           </button>
         </div>
 
