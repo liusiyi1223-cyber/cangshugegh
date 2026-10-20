@@ -236,7 +236,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-dvh bg-background pb-[90px]" style={themeStyle}>
-      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-sand bg-brand px-4">
+      <header className="sticky top-0 z-20 flex h-12 items-center justify-between border-b border-sand bg-brand px-4">
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setMenuOpen(true)}
@@ -270,7 +270,7 @@ export default function FavoritesPage() {
 
       <main className="mx-auto w-full max-w-[1000px] pl-2 pr-2 pt-3">
         <div className="flex gap-2">
-          <aside className="sticky top-[56px] flex max-h-[calc(100dvh-56px-90px)] w-[68px] shrink-0 flex-col gap-1 self-start overflow-y-auto overscroll-contain rounded-xl bg-[#f3f4f6] px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <aside className="sticky top-[48px] flex max-h-[calc(100dvh-48px-90px)] w-[68px] shrink-0 flex-col gap-1 self-start overflow-y-auto overscroll-contain rounded-xl bg-[#f3f4f6] px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               onClick={() => {
                 setTagFilter(null);
@@ -306,7 +306,7 @@ export default function FavoritesPage() {
           </aside>
 
           <div className="min-w-0 flex-1">
-            <div className="sticky top-[56px] z-20 mb-2 flex flex-col gap-2 bg-background pb-2">
+            <div className="sticky top-[48px] z-20 mb-2 flex flex-col gap-2 bg-background pb-2">
               {filterOptions.length > 1 && (
                 <div className="flex gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {filterOptions.map((p) => {
