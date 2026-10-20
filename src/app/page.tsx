@@ -27,15 +27,15 @@ export default function WelcomePage() {
     <main className="flex min-h-dvh flex-col bg-background px-6">
       <div className="flex flex-1 flex-col items-center justify-center py-12">
         <div className="relative">
-          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-[#1b3a63] to-[#4f7df9] text-white shadow-lg shadow-[#1b3a63]/25">
+          <div className="grid h-20 w-20 place-items-center rounded-3xl bg-[#6b7280] text-white shadow-lg">
             <Cloud size={40} strokeWidth={1.5} />
           </div>
-          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[#7c5cff] to-[#4f7df9] text-white">
+          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl bg-[#4b5563] text-white">
             <Bookmark size={16} strokeWidth={2} />
           </div>
         </div>
 
-        <h1 className="mt-7 bg-gradient-to-r from-[#1b3a63] via-[#4361ee] to-[#7c5cff] bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+        <h1 className="mt-7 text-3xl font-bold tracking-tight text-[#4b5563]">
           我的云收藏夹
         </h1>
         <p className="mt-2.5 text-sm text-muted">
@@ -63,7 +63,7 @@ export default function WelcomePage() {
       <div className="mx-auto w-full max-w-sm pb-10">
         <a
           href="/login"
-          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-[#1b3a63] to-[#4f7df9] text-[15px] font-semibold text-white shadow-lg shadow-[#1b3a63]/25"
+          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl bg-[#6b7280] text-[15px] font-semibold text-white shadow-lg"
         >
           登录
         </a>
@@ -72,7 +72,7 @@ export default function WelcomePage() {
             href="/register"
             className="text-sm text-muted"
           >
-            没有账号？<span className="text-brand font-medium">注册</span>
+            没有账号？<span className="text-[#4b5563] font-medium">注册</span>
           </a>
         </div>
       </div>
