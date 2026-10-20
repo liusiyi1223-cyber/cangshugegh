@@ -65,7 +65,7 @@ function FavoriteCard({
           </span>
         )}
         {!hide && (
-          <span className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 text-[9px] text-muted drop-shadow">
+          <span className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 text-[9px] text-muted drop-shadow">
             <Eye size={9} strokeWidth={2} />
             {favorite.visitCount}
           </span>
