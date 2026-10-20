@@ -242,7 +242,7 @@ export default function FavoritesPage() {
           </button>
           <div className="leading-tight">
             <h1 className="text-[15px] font-bold tracking-tight text-onbrand">我的口袋</h1>
-            <p className="text-[11px] text-onbrand opacity-70">{items.length} 条收藏</p>
+            <p className="text-[11px] text-onbrand opacity-70">{items.length} 条链接</p>
           </div>
         </div>
         <a
