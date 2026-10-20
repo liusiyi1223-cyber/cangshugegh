@@ -182,10 +182,10 @@ export default function WorkbenchPage() {
       className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]"
       style={themeStyle}
     >
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-sand bg-brand px-4 py-3">
-        <div>
-          <h1 className="text-lg font-bold tracking-tight text-onbrand">工作台</h1>
-          <p className="mt-0.5 text-xs text-onbrand opacity-70">管理标签与访问数据</p>
+      <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-sand bg-brand px-4">
+        <div className="leading-tight">
+          <h1 className="text-[15px] font-bold tracking-tight text-onbrand">工作台</h1>
+          <p className="text-[11px] text-onbrand opacity-70">管理标签与访问数据</p>
         </div>
       </header>
 
