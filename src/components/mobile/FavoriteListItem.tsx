@@ -76,7 +76,7 @@ function FavoriteListItem({
         <button
           type="button"
           onClick={() => onOpen(favorite)}
-          className={`block text-left text-[13px] font-normal leading-snug text-ink line-clamp-2 ${
+          className={`block text-left text-[13px] font-medium leading-snug text-ink line-clamp-2 ${
             broken ? "line-through" : ""
           }`}
         >
