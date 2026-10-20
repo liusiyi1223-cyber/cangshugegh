@@ -72,7 +72,7 @@ function FavoriteCard({
         )}
       </button>
 
-      <div className="px-3 pt-3">
+      <div className="bg-[#f3f4f6] px-3 pt-3 pb-3">
         <div className="text-[13px] font-medium leading-snug text-ink">
           <button
             type="button"
@@ -90,7 +90,7 @@ function FavoriteCard({
         )}
       </div>
 
-      <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-[#e5e7eb] bg-[#f3f4f6] px-3 py-2">
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-[#e5e7eb] bg-[#f3f4f6] px-3 py-2">
         {favorite.platform && (
           <span
             className="shrink-0 rounded px-1 py-0.5 text-[8px] text-white"
