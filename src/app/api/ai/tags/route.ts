@@ -3,7 +3,7 @@ import { requireUser, UnauthorizedError } from "@/lib/auth";
 import { chat } from "@/lib/ai";
 
 const ICON_NAMES =
-  "BookOpen, Code, Utensils, Music, Film, Gamepad2, Camera, Briefcase, Heart, Star, GraduationCap, Lightbulb, Globe, ShoppingBag, Plane, Home, Dumbbell, Palette, Car, Smartphone, Wrench, Leaf, Coffee, PenTool, Rocket, Cloud, Flame, MessageCircle, Newspaper, Mic";
+  "BookOpen, Code, Utensils, Music, Film, Gamepad2, Camera, Briefcase, Heart, Star, GraduationCap, Lightbulb, Globe, ShoppingBag, Plane, Home, Dumbbell, Palette, Car, Smartphone, Wrench, Leaf, Coffee, PenTool, Rocket, Cloud, Flame, MessageCircle, Newspaper, Mic, Atom, Beer, Bike, Book, BookMarked, Brain, Cake, Cat, ChefHat, Clapperboard, Coins, Compass, Dog, FileText, Fish, FlaskConical, Flower2, Footprints, Gem, Gift, Guitar, Headphones, HeartPulse, Joystick, Languages, MapPin, Medal, Microscope, Moon, Mountain, Paintbrush, PawPrint, Piano, PiggyBank, Pill, Pizza, Podcast, Puzzle, Snowflake, Sparkles, Store, Sun, Target, Tent, TrendingUp, Trophy, Tv, Video, Wallet, Wine";
 
 export async function POST(request: Request) {
   try {
