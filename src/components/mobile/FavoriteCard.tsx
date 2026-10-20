@@ -93,7 +93,7 @@ function FavoriteCard({
           <div className="flex flex-wrap items-center gap-1.5">
             {favorite.platform && (
               <span
-                className="shrink-0 rounded px-1.5 py-0.5 text-[9px] text-white"
+                className="shrink-0 rounded px-1 py-0.5 text-[8px] text-white"
                 style={{ backgroundColor: platformColor(favorite.platform) }}
               >
                 {platformName(favorite.platform)}
@@ -102,7 +102,7 @@ function FavoriteCard({
             {tags.slice(0, 2).map((t) => (
               <span
                 key={t}
-                className="shrink-0 rounded bg-brand-soft px-1.5 py-0.5 text-[9px] text-brand-dark"
+                className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-brand-dark"
               >
                 #{t}
               </span>
