@@ -16,20 +16,20 @@ function readStoredTheme(defaultColor: string): string {
 }
 
 export function useThemeColor(defaultColor = "#1b3a63") {
-  // 先从 localStorage 读，避免每次导航都闪回默认色、也不用等网络
-  const [themeColor, setThemeColorState] = useState(() =>
-    readStoredTheme(defaultColor)
-  );
+  const [themeColor, setThemeColorState] = useState(defaultColor);
 
-  // 仅在本地无缓存（首次/清缓存后）才同步服务器，避免每次导航都多一次请求
   useEffect(() => {
-    if (readStoredTheme(defaultColor) !== defaultColor) return;
+    // 先用本地缓存立即上色，避免闪回默认色
+    const stored = readStoredTheme(defaultColor);
+    if (stored !== defaultColor) setThemeColorState(stored);
+
+    // 再从服务器同步一次，以服务器为准，避免本地缓存过期导致颜色不一致
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((u) => {
         const pref = (u?.preferences as { themeColor?: string } | null)
           ?.themeColor;
-        if (pref) {
+        if (pref && pref !== themeColor) {
           setThemeColorState(pref);
           try {
             localStorage.setItem(THEME_KEY, pref);
@@ -37,6 +37,7 @@ export function useThemeColor(defaultColor = "#1b3a63") {
         }
       })
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultColor]);
 
   function setThemeColor(value: string) {
