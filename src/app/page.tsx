@@ -1,4 +1,4 @@
-import { Bookmark, Cloud } from "lucide-react";
+import { Archive, Bookmark } from "lucide-react";
 import { platformColor } from "@/lib/platforms";
 import {
   SiBilibili,
@@ -28,7 +28,7 @@ export default function WelcomePage() {
       <div className="flex flex-1 flex-col items-center justify-center py-12">
         <div className="relative">
           <div className="grid h-20 w-20 place-items-center rounded-3xl border border-[#a8a29e] text-[#57534e]">
-            <Cloud size={40} strokeWidth={1.5} />
+            <Archive size={40} strokeWidth={1.5} />
           </div>
           <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl border border-[#a8a29e] bg-white text-[#57534e]">
             <Bookmark size={16} strokeWidth={2} />
