@@ -45,7 +45,7 @@ export default function FavoritesPage() {
   const { themeColor, setThemeColor, themeStyle } = useThemeColor();
   const { hide } = useHideVisitCount();
   const [avatarColors, setAvatarColors] = useState<string[]>([]);
-  const [layout, setLayout] = useState<"masonry3" | "masonry2" | "list">("masonry3");
+  const [layout, setLayout] = useState<"masonry3" | "masonry2" | "list">("masonry2");
   const colCount = layout === "masonry2" ? 2 : 3;
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
     null
@@ -117,14 +117,14 @@ export default function FavoritesPage() {
       .then((u) => {
         const pref = (u?.preferences as { layout?: string } | null)?.layout;
         if (pref === "list" || pref === "masonry2" || pref === "masonry3") setLayout(pref);
-        else if (pref === "masonry") setLayout("masonry3");
+        else if (pref === "masonry") setLayout("masonry2");
       })
       .catch(() => {});
   }, []);
 
   function toggleLayout() {
     setLayout((prev) => {
-      const order: ("masonry3" | "masonry2" | "list")[] = ["masonry3", "masonry2", "list"];
+      const order: ("masonry3" | "masonry2" | "list")[] = ["masonry2", "masonry3", "list"];
       const idx = order.indexOf(prev);
       const next = order[(idx + 1) % order.length];
       fetch("/api/auth/me", {
