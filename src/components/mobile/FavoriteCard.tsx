@@ -72,7 +72,7 @@ function FavoriteCard({
         )}
       </button>
 
-      <div className="px-3 pt-3">
+      <div className="p-3">
         <div className="text-[13px] font-medium leading-snug text-ink">
           <button
             type="button"
@@ -88,39 +88,41 @@ function FavoriteCard({
             {favorite.author}
           </div>
         )}
-      </div>
 
-      <div className="mt-2.5 flex flex-wrap items-center gap-1.5 border-t border-[#e5e7eb] bg-[#f3f4f6] px-3 py-2">
-        {favorite.platform && (
-          <span
-            className="shrink-0 rounded px-1 py-0.5 text-[8px] text-white"
-            style={{ backgroundColor: platformColor(favorite.platform) }}
-          >
-            {platformName(favorite.platform)}
-          </span>
-        )}
-        {tags.slice(0, 2).map((t) => (
-          <span
-            key={t}
-            className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-brand-dark"
-          >
-            #{t}
-          </span>
-        ))}
-        {tags.length > 2 && (
-          <span
-            className="shrink-0 text-[10px] text-muted"
-            title={tags.join("、")}
-          >
-            …
-          </span>
-        )}
-        <time
-          title={new Date(favorite.createdAt).toLocaleString()}
-          className="ml-auto shrink-0 text-[10px] text-muted"
-        >
-          {formatRelativeTime(favorite.createdAt)}
-        </time>
+        <div className="mt-2.5 border-t border-[#f0f2f4] pt-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {favorite.platform && (
+              <span
+                className="shrink-0 rounded px-1 py-0.5 text-[8px] text-white"
+                style={{ backgroundColor: platformColor(favorite.platform) }}
+              >
+                {platformName(favorite.platform)}
+              </span>
+            )}
+            {tags.slice(0, 2).map((t) => (
+              <span
+                key={t}
+                className="shrink-0 rounded bg-brand-soft px-1 py-0.5 text-[8px] text-brand-dark"
+              >
+                #{t}
+              </span>
+            ))}
+            {tags.length > 2 && (
+              <span
+                className="shrink-0 text-[10px] text-muted"
+                title={tags.join("、")}
+              >
+                …
+              </span>
+            )}
+            <time
+              title={new Date(favorite.createdAt).toLocaleString()}
+              className="ml-auto shrink-0 text-[10px] text-muted"
+            >
+              {formatRelativeTime(favorite.createdAt)}
+            </time>
+          </div>
+        </div>
       </div>
     </article>
   );
