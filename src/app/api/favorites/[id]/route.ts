@@ -19,7 +19,7 @@ export async function PATCH(
 
   const { id } = await params;
 
-  let body: { tags?: string[]; status?: string; title?: string; cover?: string | null; incrementVisit?: boolean };
+  let body: { tags?: string[]; status?: string; title?: string; cover?: string | null; note?: string | null; incrementVisit?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -36,6 +36,7 @@ export async function PATCH(
     status?: "ACTIVE" | "BROKEN";
     title?: string;
     cover?: string | null;
+    note?: string | null;
     visitCount?: { increment: number };
   } = {};
 
@@ -62,6 +63,12 @@ export async function PATCH(
       const stored = await storeCover(c).catch(() => null);
       if (stored) data.cover = stored;
     }
+  }
+  if (body.note !== undefined) {
+    data.note =
+      typeof body.note === "string" && body.note.trim()
+        ? body.note.trim()
+        : null;
   }
   if (body.incrementVisit) {
     data.visitCount = { increment: 1 };

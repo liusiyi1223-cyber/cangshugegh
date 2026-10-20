@@ -5,11 +5,13 @@ import {
   Copy,
   ExternalLink,
   Image as ImageIcon,
+  StickyNote,
   Tag,
   Trash,
 } from "lucide-react";
 import { compressImage } from "@/lib/image";
 import type { FavoriteWithCollections } from "@/lib/types";
+import BottomSheet from "./BottomSheet";
 import TagEditSheet from "./TagEditSheet";
 
 export default function FavoriteActionSheet({
@@ -24,6 +26,10 @@ export default function FavoriteActionSheet({
   const [busy, setBusy] = useState(false);
   const [tagOpen, setTagOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const [noteBusy, setNoteBusy] = useState(false);
+  const [noteError, setNoteError] = useState("");
 
   useEffect(() => {
     if (!favorite) return;
@@ -80,6 +86,24 @@ export default function FavoriteActionSheet({
       // 上传失败则忽略，保持原封面
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function saveNote() {
+    setNoteBusy(true);
+    setNoteError("");
+    const res = await fetch(`/api/favorites/${f.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ note: noteText }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setNoteBusy(false);
+    if (res.ok) {
+      setNoteOpen(false);
+      onChanged();
+    } else {
+      setNoteError(data.error ?? "保存失败");
     }
   }
 
@@ -146,6 +170,21 @@ export default function FavoriteActionSheet({
               <span>编辑</span>
             </button>
 
+            <button
+              type="button"
+              className={rowClass}
+              onClick={() => {
+                setNoteText(f.note ?? "");
+                setNoteError("");
+                setNoteOpen(true);
+              }}
+            >
+              <span className={iconWrap}>
+                <StickyNote className={iconClass} strokeWidth={1.8} />
+              </span>
+              <span>笔记</span>
+            </button>
+
             <label className={rowClass}>
               <span className={iconWrap}>
                 <ImageIcon className={iconClass} strokeWidth={1.8} />
@@ -194,6 +233,24 @@ export default function FavoriteActionSheet({
           onChanged();
         }}
       />
+
+      <BottomSheet open={noteOpen} onClose={() => setNoteOpen(false)} title="笔记">
+        <textarea
+          value={noteText}
+          onChange={(e) => setNoteText(e.target.value)}
+          placeholder="写点笔记…"
+          rows={6}
+          className="w-full resize-none rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+        />
+        {noteError && <p className="mt-2 text-xs text-danger">{noteError}</p>}
+        <button
+          onClick={saveNote}
+          disabled={noteBusy}
+          className="mt-4 w-full rounded-xl bg-ink py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+        >
+          {noteBusy ? "保存中…" : "保存"}
+        </button>
+      </BottomSheet>
     </>
   );
 }

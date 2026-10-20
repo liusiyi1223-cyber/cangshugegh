@@ -318,8 +318,11 @@ export default function WorkbenchPage() {
                   </div>
                   <div className="space-y-1">
                     {items.map((f) => (
-                      <div key={f.id} className="truncate text-[13px] text-ink">
-                        {f.title}
+                      <div key={f.id}>
+                        <div className="truncate text-[13px] text-ink">{f.title}</div>
+                        {f.note && (
+                          <div className="truncate pl-2 text-xs text-muted">{f.note}</div>
+                        )}
                       </div>
                     ))}
                   </div>
