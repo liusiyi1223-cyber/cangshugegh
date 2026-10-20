@@ -199,7 +199,7 @@ export default function WorkbenchPage() {
             onClick={() => setHideVisitCount(!hide)}
             aria-label="切换隐藏访问次数"
             className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-              hide ? "bg-brand" : "bg-sand"
+              hide ? "bg-ink" : "bg-sand"
             }`}
           >
             <span
@@ -218,13 +218,13 @@ export default function WorkbenchPage() {
           <div className="flex gap-2">
             <button
               onClick={exportMarkdown}
-              className="flex-1 rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink"
+              className="flex-1 rounded-xl bg-[#f3f4f6] px-4 py-2.5 text-sm font-medium text-ink"
             >
               导出 Markdown
             </button>
             <button
               onClick={exportJson}
-              className="flex-1 rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink"
+              className="flex-1 rounded-xl bg-[#f3f4f6] px-4 py-2.5 text-sm font-medium text-ink"
             >
               导出 JSON
             </button>
@@ -244,7 +244,7 @@ export default function WorkbenchPage() {
               <button
                 onClick={generateSummary}
                 disabled={summaryLoading}
-                className="mt-2 w-full rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-ink disabled:opacity-50"
+                className="mt-2 w-full rounded-xl bg-[#f3f4f6] px-4 py-2 text-xs font-medium text-ink disabled:opacity-50"
               >
                 {summaryLoading ? "重新生成中…" : "重新生成"}
               </button>
@@ -253,7 +253,7 @@ export default function WorkbenchPage() {
             <button
               onClick={generateSummary}
               disabled={summaryLoading || favorites.length === 0}
-              className="w-full rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
+              className="w-full rounded-xl bg-[#f3f4f6] px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
             >
               {summaryLoading ? "生成中…" : "生成总结"}
             </button>
@@ -269,7 +269,7 @@ export default function WorkbenchPage() {
             <button
               onClick={detectDuplicates}
               disabled={dedupeLoading || favorites.length < 2}
-              className="w-full rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
+              className="w-full rounded-xl bg-[#f3f4f6] px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
             >
               {dedupeLoading ? "检测中…" : "检测重复收藏"}
             </button>
@@ -294,7 +294,7 @@ export default function WorkbenchPage() {
               })}
               <button
                 onClick={() => setDuplicateIds([])}
-                className="w-full rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-ink"
+                className="w-full rounded-xl bg-[#f3f4f6] px-4 py-2 text-xs font-medium text-ink"
               >
                 清除结果
               </button>
@@ -376,7 +376,7 @@ export default function WorkbenchPage() {
             <button
               onClick={createTag}
               disabled={!newTagName.trim()}
-              className="shrink-0 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-onbrand disabled:opacity-50"
+              className="shrink-0 rounded-xl bg-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
               新建
             </button>
@@ -390,7 +390,7 @@ export default function WorkbenchPage() {
                 .map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-[13px] text-ink"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#f3f4f6] px-3 py-1.5 text-[13px] text-ink"
                   >
                     {tag}
                     <span className="text-[11px] text-muted">
