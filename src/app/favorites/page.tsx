@@ -272,7 +272,7 @@ export default function FavoritesPage() {
                 setQuery("");
                 setAiIds(null);
               }}
-              className={`relative shrink-0 rounded-lg px-1 py-2 text-left text-[13px] font-normal ${
+              className={`relative shrink-0 rounded-lg px-1 py-2 text-center text-[13px] font-normal ${
                 tagFilter === null
                   ? "bg-brand-soft font-medium text-ink"
                   : "text-muted"
@@ -290,7 +290,7 @@ export default function FavoritesPage() {
                     setQuery("");
                     setAiIds(null);
                   }}
-                  className={`relative shrink-0 truncate rounded-lg px-1 py-2 text-left text-[13px] font-normal ${
+                  className={`relative shrink-0 truncate rounded-lg px-1 py-2 text-center text-[13px] font-normal ${
                     active ? "bg-brand-soft font-medium text-ink" : "text-muted"
                   }`}
                 >
