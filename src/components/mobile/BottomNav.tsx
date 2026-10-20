@@ -57,9 +57,9 @@ export default function BottomNav() {
           <button
             onClick={() => setAddOpen(true)}
             aria-label="添加收藏"
-            className="grid h-11 w-11 place-items-center rounded-full bg-onbrand text-brand shadow-lg shadow-black/20"
+            className="grid h-11 w-11 place-items-center text-onbrand"
           >
-            <Plus size={20} strokeWidth={2.2} />
+            <Plus size={26} strokeWidth={2.2} />
           </button>
         </div>
 
