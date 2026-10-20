@@ -212,19 +212,19 @@ export default function WorkbenchPage() {
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <Download size={16} className="text-brand" />
+            <Download size={16} className="text-ink" />
             导出备份
           </div>
           <div className="flex gap-2">
             <button
               onClick={exportMarkdown}
-              className="flex-1 rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-brand"
+              className="flex-1 rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink"
             >
               导出 Markdown
             </button>
             <button
               onClick={exportJson}
-              className="flex-1 rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-brand"
+              className="flex-1 rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink"
             >
               导出 JSON
             </button>
@@ -233,7 +233,7 @@ export default function WorkbenchPage() {
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <Sparkles size={16} className="text-brand" />
+            <Sparkles size={16} className="text-ink" />
             AI 收藏总结
           </div>
           {aiSummary ? (
@@ -244,7 +244,7 @@ export default function WorkbenchPage() {
               <button
                 onClick={generateSummary}
                 disabled={summaryLoading}
-                className="mt-2 w-full rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-brand disabled:opacity-50"
+                className="mt-2 w-full rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-ink disabled:opacity-50"
               >
                 {summaryLoading ? "重新生成中…" : "重新生成"}
               </button>
@@ -253,7 +253,7 @@ export default function WorkbenchPage() {
             <button
               onClick={generateSummary}
               disabled={summaryLoading || favorites.length === 0}
-              className="w-full rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-brand disabled:opacity-50"
+              className="w-full rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
             >
               {summaryLoading ? "生成中…" : "生成总结"}
             </button>
@@ -262,14 +262,14 @@ export default function WorkbenchPage() {
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <CopyCheck size={16} className="text-brand" />
+            <CopyCheck size={16} className="text-ink" />
             智能去重
           </div>
           {duplicateIds.length === 0 ? (
             <button
               onClick={detectDuplicates}
               disabled={dedupeLoading || favorites.length < 2}
-              className="w-full rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-brand disabled:opacity-50"
+              className="w-full rounded-xl bg-brand-soft px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
             >
               {dedupeLoading ? "检测中…" : "检测重复收藏"}
             </button>
@@ -294,7 +294,7 @@ export default function WorkbenchPage() {
               })}
               <button
                 onClick={() => setDuplicateIds([])}
-                className="w-full rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-brand"
+                className="w-full rounded-xl bg-brand-soft px-4 py-2 text-xs font-medium text-ink"
               >
                 清除结果
               </button>
@@ -304,7 +304,7 @@ export default function WorkbenchPage() {
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <CalendarDays size={16} className="text-brand" />
+            <CalendarDays size={16} className="text-ink" />
             收藏时间线
           </div>
           {groupedByDate.length === 0 ? (
@@ -331,7 +331,7 @@ export default function WorkbenchPage() {
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <Eye size={16} className="text-brand" />
+            <Eye size={16} className="text-ink" />
             访问数据
           </div>
           <div className="mb-3 flex items-baseline gap-2">
@@ -363,7 +363,7 @@ export default function WorkbenchPage() {
 
         <section className="rounded-2xl bg-white p-4 shadow-card">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <TagIcon size={16} className="text-brand" />
+            <TagIcon size={16} className="text-ink" />
             标签管理
           </div>
           <div className="mb-3 flex gap-2">
@@ -390,7 +390,7 @@ export default function WorkbenchPage() {
                 .map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-[13px] text-brand-dark"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-[13px] text-ink"
                   >
                     {tag}
                     <span className="text-[11px] text-muted">
@@ -399,7 +399,7 @@ export default function WorkbenchPage() {
                     <button
                       onClick={() => removeTag(tag)}
                       aria-label={`删除标签 ${tag}`}
-                      className="text-brand-dark/60 hover:text-brand-dark"
+                      className="text-ink/60 hover:text-ink"
                     >
                       <Trash2 size={13} strokeWidth={2} />
                     </button>
