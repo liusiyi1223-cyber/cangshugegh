@@ -34,11 +34,13 @@ function searchPlaceholder(tagFilter: string | null, filter: string): string {
   return `搜索${head}或${parts[parts.length - 1]}…`;
 }
 
+let cachedItems: FavoriteWithCollections[] | null = null;
+
 export default function FavoritesPage() {
-  const [items, setItems] = useState<FavoriteWithCollections[]>([]);
+  const [items, setItems] = useState<FavoriteWithCollections[]>(() => cachedItems ?? []);
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(cachedItems === null);
   const [userName, setUserName] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,7 +61,6 @@ export default function FavoritesPage() {
   }, [query]);
 
   const load = useCallback(async () => {
-    setLoading(true);
     const [fr, ur] = await Promise.all([
       fetch("/api/favorites", { cache: "no-store" }),
       fetch("/api/auth/me", { cache: "no-store" }),
@@ -68,7 +69,11 @@ export default function FavoritesPage() {
       window.location.href = "/login";
       return;
     }
-    if (fr.ok) setItems(await fr.json());
+    if (fr.ok) {
+      const data = await fr.json();
+      cachedItems = data;
+      setItems(data);
+    }
     if (ur.ok) {
       const u = await ur.json();
       setUserName(u.name ?? "");
