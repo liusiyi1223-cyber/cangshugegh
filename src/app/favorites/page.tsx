@@ -45,7 +45,7 @@ export default function FavoritesPage() {
   const { themeColor, setThemeColor, themeStyle } = useThemeColor();
   const { hide } = useHideVisitCount();
   const [avatarColors, setAvatarColors] = useState<string[]>([]);
-  const [colCount, setColCount] = useState(2);
+  const colCount = 3;
   const [layout, setLayout] = useState<"masonry" | "list">("masonry");
   const [activeFavorite, setActiveFavorite] = useState<FavoriteWithCollections | null>(
     null
@@ -207,14 +207,6 @@ export default function FavoritesPage() {
       setFilter("all");
     }
   }, [filter, filterOptions]);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const update = () => setColCount(mq.matches ? 3 : 2);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
 
   const columns = useMemo(() => {
     const cols: FavoriteWithCollections[][] = Array.from(
@@ -378,7 +370,7 @@ export default function FavoritesPage() {
 
             <div>
             {loading ? (
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+          <div className="grid grid-cols-3 gap-2">
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
