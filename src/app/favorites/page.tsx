@@ -270,7 +270,7 @@ export default function FavoritesPage() {
 
       <main className="mx-auto w-full max-w-[1000px] pl-2 pr-2 pt-3">
         <div className="flex gap-2">
-          <aside className="sticky top-[56px] flex max-h-[calc(100dvh-56px-90px)] w-[68px] shrink-0 flex-col gap-1 self-start overflow-y-auto overscroll-contain pb-2">
+          <aside className="sticky top-[56px] flex max-h-[calc(100dvh-56px-90px)] w-[68px] shrink-0 flex-col gap-1 self-start overflow-y-auto overscroll-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               onClick={() => {
                 setTagFilter(null);
