@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 
 vi.mock("node:dns", () => ({
   lookup: vi.fn(),
@@ -8,7 +8,7 @@ import { lookup } from "node:dns";
 import {
   isBlockedIp,
   isAllowedHost,
-  safeLookup,
+  assertPublicHost,
   safeFetch,
   readBodyLimited,
 } from "../src/lib/net";
@@ -85,8 +85,8 @@ describe("isAllowedHost", () => {
   });
 });
 
-describe("safeLookup", () => {
-  it("解析到内网 IP 时回调错误（防 DNS 重绑定）", () => {
+describe("assertPublicHost", () => {
+  it("解析到内网 IP 时拒绝（防 DNS 重绑定）", async () => {
     (mockedLookup as any).mockImplementation(
       (_hostname: string, _options: unknown, cb: any) => {
         cb(null, [
@@ -96,25 +96,31 @@ describe("safeLookup", () => {
       }
     );
 
-    const callback = vi.fn();
-    safeLookup("example.com", {}, callback);
-    expect(callback).toHaveBeenCalledWith(expect.any(Error));
+    await expect(assertPublicHost("example.com")).rejects.toThrow(
+      "拒绝访问内网地址"
+    );
   });
 
-  it("全部为公网 IP 时回调第一个地址", () => {
+  it("全部为公网 IP 时通过", async () => {
     (mockedLookup as any).mockImplementation(
       (_hostname: string, _options: unknown, cb: any) => {
         cb(null, [{ address: "8.8.8.8", family: 4 }]);
       }
     );
 
-    const callback = vi.fn();
-    safeLookup("example.com", {}, callback);
-    expect(callback).toHaveBeenCalledWith(null, "8.8.8.8", 4);
+    await expect(assertPublicHost("example.com")).resolves.toBeUndefined();
   });
 });
 
 describe("safeFetch", () => {
+  beforeEach(() => {
+    (mockedLookup as any).mockImplementation(
+      (_hostname: string, _options: unknown, cb: any) => {
+        cb(null, [{ address: "8.8.8.8", family: 4 }]);
+      }
+    );
+  });
+
   it("拒绝非 http/https 协议", async () => {
     await expect(
       safeFetch("ftp://example.com/x", { allowedDomains: ["example.com"] })

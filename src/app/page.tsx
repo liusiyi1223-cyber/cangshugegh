@@ -36,7 +36,7 @@ export default function WelcomePage() {
         </div>
 
         <h1 className="mt-7 text-3xl font-bold tracking-tight text-[#57534e]">
-          我的云收藏夹
+          口袋链
         </h1>
         <p className="mt-2.5 text-sm text-muted">
           把分散在各个平台的喜欢，收藏到这里。

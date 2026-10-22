@@ -1,5 +1,4 @@
 import { lookup } from "node:dns";
-import { Agent } from "undici";
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
@@ -55,12 +54,8 @@ export function isAllowedHost(hostname: string, domains: string[]): boolean {
   });
 }
 
-// 供 undici Agent 在连接时做 DNS 解析：解析出全部 IP，任一命中内网即拒绝，防 DNS 重绑定
-export function safeLookup(
-  hostname: string,
-  _options: unknown,
-  callback: (err: Error | null, address?: string, family?: number) => void
-): void {
+// 预解析域名：解析出全部 IP，任一命中内网即拒绝，防 DNS 重绑定（SSRF）
+export async function assertPublicHost(hostname: string): Promise<void> {
   const lookupWithAll = lookup as unknown as (
     hostname: string,
     options: { all: true },
@@ -70,33 +65,20 @@ export function safeLookup(
     ) => void
   ) => void;
 
-  lookupWithAll(hostname, { all: true }, (err, addresses) => {
-    if (err) {
-      callback(err as Error);
-      return;
+  const addresses = await new Promise<{ address: string; family: number }[]>(
+    (resolve, reject) => {
+      lookupWithAll(hostname, { all: true }, (err, addrs) => {
+        if (err) reject(err);
+        else resolve(addrs);
+      });
     }
-    for (const item of addresses) {
-      if (isBlockedIp(item.address)) {
-        callback(new Error(`拒绝访问内网地址: ${item.address}`));
-        return;
-      }
+  );
+
+  for (const item of addresses) {
+    if (isBlockedIp(item.address)) {
+      throw new Error(`拒绝访问内网地址: ${item.address}`);
     }
-    const first = addresses[0];
-    callback(null, first.address, first.family);
-  });
-}
-
-let agent: Agent | null = null;
-
-function getAgent(): Agent {
-  if (!agent) {
-    agent = new Agent({
-      connect: {
-        lookup: safeLookup as never,
-      },
-    });
   }
-  return agent;
 }
 
 export interface SafeFetchOptions {
@@ -137,14 +119,14 @@ export async function safeFetch(
   try {
     let current = url;
     for (let i = 0; i <= maxRedirects; i++) {
-      assertSafeUrl(current, allowedDomains);
+      const parsed = assertSafeUrl(current, allowedDomains);
+      await assertPublicHost(parsed.hostname);
 
       const res = await fetch(current, {
         redirect: "manual",
         signal: controller.signal,
         headers: { "user-agent": UA, accept: options.accept ?? "text/html" },
-        dispatcher: getAgent(),
-      } as RequestInit & { dispatcher: Agent });
+      });
 
       if (res.status >= 300 && res.status < 400) {
         const location = res.headers.get("location");

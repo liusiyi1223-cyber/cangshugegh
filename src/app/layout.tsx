@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "我的云收藏夹",
+  title: "口袋链",
   description: "把分散在各平台的收藏，集中管理",
 };
 
