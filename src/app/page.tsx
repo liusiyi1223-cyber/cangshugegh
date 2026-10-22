@@ -25,7 +25,7 @@ export default function WelcomePage() {
   return (
     <main className="flex min-h-dvh flex-col bg-background px-6">
       <div className="flex flex-1 flex-col items-center justify-center py-12">
-        <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-2xl">
+        <div className="grid h-48 w-48 place-items-center overflow-hidden rounded-2xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.jpg"
@@ -34,10 +34,7 @@ export default function WelcomePage() {
           />
         </div>
 
-        <h1 className="mt-7 text-3xl font-bold tracking-tight text-[#57534e]">
-          口袋链
-        </h1>
-        <p className="mt-2.5 text-sm text-muted">
+        <p className="mt-8 text-sm text-muted">
           把分散在各个平台的喜欢，收藏到这里。
         </p>
 
@@ -62,7 +59,7 @@ export default function WelcomePage() {
       <div className="mx-auto w-full max-w-sm pb-4">
         <a
           href="/login"
-          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-[#a8a29e] text-[15px] font-semibold text-[#57534e]"
+          className="flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-brand-ink text-[15px] font-semibold text-brand-ink"
         >
           登录
         </a>
@@ -71,7 +68,7 @@ export default function WelcomePage() {
             href="/register"
             className="text-sm text-muted"
           >
-            没有账号？<span className="text-[#57534e] font-medium">注册</span>
+            没有账号？<span className="text-brand-ink font-medium">注册</span>
           </a>
         </div>
       </div>
