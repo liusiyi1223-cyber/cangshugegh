@@ -384,11 +384,11 @@ export default function WorkbenchPage() {
               新建
             </button>
           </div>
-          {tagCounts.size === 0 ? (
+          {userTags.length === 0 ? (
             <p className="py-4 text-center text-sm text-muted">还没有标签</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {[...tagCounts.keys()]
+              {[...userTags]
                 .sort((a, b) => (tagCounts.get(b) ?? 0) - (tagCounts.get(a) ?? 0))
                 .map((tag) => (
                   <span

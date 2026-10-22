@@ -53,6 +53,7 @@ export default function FavoritesPage() {
     null
   );
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [userTags, setUserTags] = useState<string[]>([]);
   const [aiIds, setAiIds] = useState<string[] | null>(null);
   const [aiHistory, setAiHistory] = useState<string[]>([]);
   const queryRef = useRef(query);
@@ -78,6 +79,7 @@ export default function FavoritesPage() {
       const u = await ur.json();
       setUserName(u.name ?? "");
       setUserAvatar(u.avatar ?? "");
+      setUserTags(u.tags ?? []);
     }
     setLoading(false);
   }, []);
@@ -193,18 +195,6 @@ export default function FavoritesPage() {
     });
   }, [items, query, filter, tagFilter, aiIds]);
 
-  const allTags = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const it of items) {
-      for (const t of it.tags ?? []) {
-        counts.set(t, (counts.get(t) ?? 0) + 1);
-      }
-    }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .map(([t]) => t);
-  }, [items]);
-
   const filterOptions = useMemo(() => {
     const used = new Set(items.map((it) => it.platform).filter(Boolean));
     return [{ key: "all", name: "全部" }, ...PLATFORMS.filter((p) => used.has(p.key))];
@@ -285,7 +275,7 @@ export default function FavoritesPage() {
             >
               全部
             </button>
-            {allTags.map((t) => {
+            {userTags.map((t) => {
               const active = tagFilter === t;
               return (
                 <button
