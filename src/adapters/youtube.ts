@@ -4,12 +4,17 @@ import { absolutize, fetchHtml } from "./utils";
 
 export const youtubeAdapter: PlatformAdapter = {
   name: "youtube",
-  domains: ["youtube.com"],
+  domains: ["youtube.com", "youtu.be"],
 
   match(url: string): boolean {
     try {
       const host = new URL(url).hostname;
-      return host === "youtube.com" || host.endsWith(".youtube.com");
+      return (
+        host === "youtube.com" ||
+        host.endsWith(".youtube.com") ||
+        host === "youtu.be" ||
+        host.endsWith(".youtu.be")
+      );
     } catch {
       return false;
     }

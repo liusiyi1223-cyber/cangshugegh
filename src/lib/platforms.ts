@@ -116,7 +116,7 @@ export function detectPlatform(url: string): string | undefined {
     ["weibo", ["weibo.com", "weibo.cn"]],
     ["baidu", ["baidu.com"]],
     ["wechat", ["weixin.qq.com"]],
-    ["youtube", ["youtube.com"]],
+    ["youtube", ["youtube.com", "youtu.be"]],
     ["instagram", ["instagram.com", "instagr.am"]],
     ["x", ["twitter.com", "x.com"]],
   ];
