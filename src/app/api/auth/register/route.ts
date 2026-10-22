@@ -5,6 +5,22 @@ import { verifyCode } from "@/lib/verify-code";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// 新用户默认的平台分类标签（与 src/lib/platforms.ts 的 PLATFORMS 名称保持一致）
+const DEFAULT_TAGS = [
+  "哔哩哔哩",
+  "知乎",
+  "小红书",
+  "抖音",
+  "微博",
+  "百度",
+  "公众号",
+  "视频号",
+  "YouTube",
+  "Instagram",
+  "X（推特）",
+  "其他",
+];
+
 export async function POST(request: Request) {
   let body: {
     email?: string;
@@ -51,7 +67,7 @@ export async function POST(request: Request) {
 
   const passwordHash = await hashPassword(password);
   const user = await db.user.create({
-    data: { email, passwordHash, name: name || null, avatar: avatar || null },
+    data: { email, passwordHash, name: name || null, avatar: avatar || null, tags: DEFAULT_TAGS },
   });
   await createSession(user.id);
 
