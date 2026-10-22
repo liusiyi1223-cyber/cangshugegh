@@ -187,7 +187,16 @@ export default function MePage() {
           {showBookmarklet && (
             <div className="border-b border-sand px-4 py-3">
               <p className="text-xs text-muted">
-                复制下面的代码，在电脑浏览器书签栏新建书签并粘贴。手机端无法拖拽书签，请在电脑浏览器使用。
+                用鼠标按住下面按钮，拖到浏览器「收藏夹栏」上松开，即可完成添加。之后在 B站/小红书等页面点它，就能带真实封面收藏。
+              </p>
+              <a
+                href={bookmarklet}
+                className="mt-3 block cursor-grab rounded-full bg-brand px-4 py-2.5 text-center text-sm font-medium text-onbrand"
+              >
+                拖我到收藏夹栏
+              </a>
+              <p className="mt-3 text-xs text-muted">
+                拖拽不了的话，手动添加：右键收藏夹栏 → 添加页面，名称随便填，网址粘贴下面代码。
               </p>
               <div className="mt-2 break-all rounded-lg bg-cream p-3 text-xs text-muted">
                 {bookmarklet}
