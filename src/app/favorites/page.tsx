@@ -90,6 +90,33 @@ export default function FavoritesPage() {
     load();
   }, [load]);
 
+  // 书签小工具跳转过来时，自动保存带 url/cover/title 的收藏
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get("url");
+    if (!url) return;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url,
+            title: params.get("title") ?? "",
+            cover: params.get("cover") ?? undefined,
+            platform: "other",
+          }),
+        });
+        if (res.ok) await load();
+      } catch {
+        // 保存失败静默，清掉参数即可
+      } finally {
+        window.history.replaceState({}, "", "/favorites");
+      }
+    })();
+  }, [load]);
+
   const refreshProfile = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me", { cache: "no-store" });
