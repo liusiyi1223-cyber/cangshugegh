@@ -23,8 +23,8 @@ ssh root@你的服务器公网IP
 # 更新软件源
 sudo apt-get update
 
-# 安装 Node.js 20 LTS（Next.js 16 需要 Node 18.18+）
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+# 安装 Node.js 24 LTS（undici@8 要求 Node >= 22.19，装 20 会导致 next build 失败）
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # 安装 PostgreSQL
