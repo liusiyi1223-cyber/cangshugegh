@@ -12,9 +12,19 @@ type Stat = {
   failureRate: number;
 };
 
+type AdminUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: string;
+  _count: { favorites: number };
+};
+
 export default function StatsPage() {
   const { themeStyle } = useThemeColor();
   const [stats, setStats] = useState<Stat[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [error, setError] = useState("");
 
@@ -27,6 +37,11 @@ export default function StatsPage() {
       })
       .then((list: Stat[]) => setStats(Array.isArray(list) ? list : []))
       .catch((e: Error) => setError(e.message));
+
+    fetch("/api/admin/users")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: AdminUser[]) => setUsers(Array.isArray(list) ? list : []))
+      .catch(() => setUsers([]));
 
     fetch("/api/favorites")
       .then((r) => (r.ok ? r.json() : []))
@@ -50,6 +65,46 @@ export default function StatsPage() {
           <p className="py-24 text-center text-sm text-muted">{error}</p>
         ) : (
           <>
+            <div className="mb-4 rounded-2xl bg-white p-4 shadow-card">
+              <div className="mb-3 text-sm font-semibold text-ink">
+                用户（{users.length}）
+              </div>
+              {users.length === 0 ? (
+                <p className="py-4 text-center text-sm text-muted">暂无用户</p>
+              ) : (
+                <div className="space-y-1">
+                  {users.map((u) => (
+                    <div
+                      key={u.id}
+                      className="flex items-center gap-2 border-b border-sand py-2 last:border-b-0"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[13px] text-ink">
+                          {u.name || "未设置昵称"}
+                          {u.role === "ADMIN" && (
+                            <span className="ml-1 text-[10px] text-brand-ink">
+                              管理员
+                            </span>
+                          )}
+                        </div>
+                        <div className="truncate text-[11px] text-muted">
+                          {u.email}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="text-xs text-muted">
+                          {u._count.favorites} 条收藏
+                        </div>
+                        <div className="text-[10px] text-muted">
+                          {new Date(u.createdAt).toLocaleDateString("zh-CN")}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-white p-4 shadow-card">
                 <span className="text-xs text-muted">抓取总次数</span>
