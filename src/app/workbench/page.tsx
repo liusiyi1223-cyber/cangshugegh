@@ -171,9 +171,12 @@ export default function WorkbenchPage() {
 
   const [duplicateIds, setDuplicateIds] = useState<string[]>([]);
   const [dedupeLoading, setDedupeLoading] = useState(false);
+  const [dedupeDone, setDedupeDone] = useState(false);
+  const [dedupeError, setDedupeError] = useState("");
 
   async function detectDuplicates() {
     setDedupeLoading(true);
+    setDedupeError("");
     try {
       const res = await fetch("/api/ai/dedupe", {
         method: "POST",
@@ -182,12 +185,15 @@ export default function WorkbenchPage() {
           items: favorites.map((f) => ({ id: f.id, title: f.title })),
         }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
         setDuplicateIds(data.duplicateIds ?? []);
+        setDedupeDone(true);
+      } else {
+        setDedupeError(data.error ?? "检测失败，请稍后重试");
       }
     } catch {
-      // AI 失败静默
+      setDedupeError("检测失败，请稍后重试");
     } finally {
       setDedupeLoading(false);
     }
@@ -280,24 +286,20 @@ export default function WorkbenchPage() {
             <CopyCheck size={16} className="text-ink" />
             智能去重
           </div>
-          {duplicateIds.length === 0 ? (
-            <button
-              onClick={detectDuplicates}
-              disabled={dedupeLoading || favorites.length < 2}
-              className="w-full rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
-            >
-              {dedupeLoading ? "检测中…" : "检测重复收藏"}
-            </button>
-          ) : (
+          {duplicateIds.length > 0 ? (
             <div className="space-y-2">
+              <p className="text-xs text-muted">发现 {duplicateIds.length} 条疑似重复：</p>
               {duplicateIds.map((id) => {
                 const f = favorites.find((x) => x.id === id);
                 if (!f) return null;
                 return (
-                  <div key={id} className="flex items-center gap-2">
-                    <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
-                      {f.title}
-                    </span>
+                  <div key={id} className="flex items-center gap-2 rounded-lg bg-cream px-3 py-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[13px] text-ink">{f.title}</div>
+                      <div className="truncate text-[11px] text-muted">
+                        {platformName(f.platform)}
+                      </div>
+                    </div>
                     <button
                       onClick={() => removeDuplicate(id)}
                       className="shrink-0 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600"
@@ -308,12 +310,35 @@ export default function WorkbenchPage() {
                 );
               })}
               <button
-                onClick={() => setDuplicateIds([])}
+                onClick={() => {
+                  setDuplicateIds([]);
+                  setDedupeDone(false);
+                }}
                 className="w-full rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2 text-xs font-medium text-ink"
               >
                 清除结果
               </button>
             </div>
+          ) : (
+            <>
+              {dedupeDone && !dedupeLoading && (
+                <p className="mb-2 rounded-lg bg-brand-soft px-3 py-2 text-xs text-ink">
+                  未发现重复内容
+                </p>
+              )}
+              {dedupeError && (
+                <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+                  {dedupeError}
+                </p>
+              )}
+              <button
+                onClick={detectDuplicates}
+                disabled={dedupeLoading || favorites.length < 2}
+                className="w-full rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2.5 text-sm font-medium text-ink disabled:opacity-50"
+              >
+                {dedupeLoading ? "检测中…" : "检测重复收藏"}
+              </button>
+            </>
           )}
         </section>
 
