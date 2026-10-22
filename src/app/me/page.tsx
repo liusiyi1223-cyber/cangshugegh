@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  BarChart3,
   Bookmark,
   ChevronRight,
   LogOut,
@@ -23,33 +22,6 @@ type User = {
   avatar: string | null;
   role: string;
 };
-type Stat = {
-  platform: string;
-  total: number;
-  success: number;
-  failed: number;
-  failureRate: number;
-};
-
-function StatRow({ s }: { s: Stat }) {
-  const rate = s.total ? s.success / s.total : 0;
-  return (
-    <div className="py-2">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-ink">{s.platform}</span>
-        <span className="text-xs text-muted">
-          {s.success} 成功 / {s.failed} 失败
-        </span>
-      </div>
-      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-cream">
-        <div
-          className="h-full rounded-full bg-brand"
-          style={{ width: `${Math.round(rate * 100)}%` }}
-        />
-      </div>
-    </div>
-  );
-}
 
 export default function MePage() {
   const router = useRouter();
@@ -60,9 +32,6 @@ export default function MePage() {
   const [editAvatar, setEditAvatar] = useState("");
   const [editBusy, setEditBusy] = useState(false);
   const [editError, setEditError] = useState("");
-  const [showStats, setShowStats] = useState(false);
-  const [stats, setStats] = useState<Stat[]>([]);
-  const [statsError, setStatsError] = useState("");
   const [showBookmarklet, setShowBookmarklet] = useState(false);
   const [bookmarklet, setBookmarklet] = useState("");
   const [copied, setCopied] = useState(false);
@@ -117,17 +86,6 @@ export default function MePage() {
     } else {
       setEditError(data.error ?? "保存失败");
     }
-  }
-
-  async function toggleStats() {
-    if (!showStats) {
-      setStatsError("");
-      const res = await fetch("/api/stats");
-      if (res.ok) setStats(await res.json());
-      else if (res.status === 403) setStatsError("仅管理员可见");
-      else setStatsError("加载失败");
-    }
-    setShowStats((v) => !v);
   }
 
   async function copyBookmarklet() {
@@ -219,25 +177,6 @@ export default function MePage() {
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-card">
-          <button
-            onClick={toggleStats}
-            className="flex h-12 w-full items-center gap-3 border-b border-sand px-4 text-left text-[15px] text-ink active:bg-sand"
-          >
-            <BarChart3 className="h-5 w-5 text-muted" strokeWidth={1.8} />
-            <span>抓取统计</span>
-          </button>
-          {showStats && (
-            <div className="border-b border-sand px-4 py-2">
-              {statsError ? (
-                <p className="py-3 text-sm text-muted">{statsError}</p>
-              ) : stats.length === 0 ? (
-                <p className="py-3 text-sm text-muted">暂无数据</p>
-              ) : (
-                stats.map((s) => <StatRow key={s.platform} s={s} />)
-              )}
-            </div>
-          )}
-
           <button
             onClick={() => setShowBookmarklet((v) => !v)}
             className="flex h-12 w-full items-center gap-3 border-b border-sand px-4 text-left text-[15px] text-ink active:bg-sand"
