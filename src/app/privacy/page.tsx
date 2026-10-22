@@ -1,0 +1,82 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "隐私政策 - 我的云收藏夹",
+};
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-6">
+      <h2 className="text-base font-semibold text-ink">{title}</h2>
+      <div className="mt-2 space-y-2 text-sm leading-relaxed text-muted">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+export default function PrivacyPage() {
+  return (
+    <main className="min-h-dvh bg-background px-6 py-8">
+      <div className="mx-auto w-full max-w-[640px]">
+        <Link href="/" className="text-sm text-muted hover:text-brand">
+          ← 返回首页
+        </Link>
+
+        <h1 className="mt-5 text-2xl font-bold text-ink">隐私政策</h1>
+        <p className="mt-1 text-sm text-muted">生效日期：2026-10-22</p>
+
+        <p className="mt-5 text-sm leading-relaxed text-muted">
+          「互联网总收藏夹」（以下简称「本网站」）重视你的个人信息和隐私保护。本政策说明我们在提供服务过程中如何收集、使用和保护你的信息。
+        </p>
+
+        <Section title="一、我们收集哪些信息">
+          <p>1. 账号信息：你注册时提供的邮箱地址，用于登录认证。</p>
+          <p>2. 密码：以不可逆的加密哈希形式存储，我们无法获知你的明文密码。</p>
+          <p>3. 收藏数据：你主动添加的收藏内容，包括链接、标题、封面图、作者、标签、收藏夹名称等元数据。</p>
+        </Section>
+
+        <Section title="二、信息如何使用">
+          <p>邮箱地址仅用于账号注册、登录和必要的安全验证。</p>
+          <p>收藏数据仅用于你在本网站内的收藏整理、搜索与管理。</p>
+        </Section>
+
+        <Section title="三、信息如何存储">
+          <p>所有数据存储在中国大陆境内的服务器。</p>
+          <p>每个用户的收藏数据严格隔离，仅本人可见，不对外公开展示。</p>
+          <p>密码仅保存加密哈希，不保存明文。</p>
+        </Section>
+
+        <Section title="四、我们不做什么">
+          <p>不下载、不存储视频或文章内容本身，只保存链接和公开的标题、封面等元数据。</p>
+          <p>不向任何第三方出售、出租或共享你的个人信息。</p>
+          <p>不提供社交、评论等互动功能，不将你的收藏公开给他人。</p>
+        </Section>
+
+        <Section title="五、Cookie 的使用">
+          <p>本网站使用 Cookie 保存登录状态（30 天有效），用于识别已登录用户。退出登录即失效。</p>
+        </Section>
+
+        <Section title="六、你的权利">
+          <p>你可随时查看、编辑、删除自己添加的收藏和收藏夹。</p>
+          <p>你可通过删除账号的方式，要求我们删除你的全部个人数据。</p>
+        </Section>
+
+        <Section title="七、信息安全">
+          <p>
+            我们采取合理的技术措施保护你的数据，包括密码加密存储、按用户隔离的数据访问控制、对外请求的安全校验等。但请注意，任何网络服务都无法保证绝对安全。
+          </p>
+        </Section>
+
+        <Section title="八、政策更新">
+          <p>本政策如发生变更，我们会在本页面更新。请定期查阅。</p>
+        </Section>
+
+        <Section title="九、联系我们">
+          <p>如对本政策有任何疑问，请通过邮箱联系我们：1797102287@qq.com。</p>
+        </Section>
+      </div>
+    </main>
+  );
+}

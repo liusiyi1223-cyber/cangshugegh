@@ -232,6 +232,12 @@ export default function LoginPage() {
             注册
           </Link>
         </p>
+
+        <p className="mt-3 text-center text-[12px] text-muted">
+          <Link href="/privacy" className="hover:text-brand">
+            隐私政策
+          </Link>
+        </p>
       </div>
     </main>
   );
