@@ -1,4 +1,3 @@
-import { Bookmark, Link } from "lucide-react";
 import { platformColor } from "@/lib/platforms";
 import {
   SiBilibili,
@@ -26,13 +25,13 @@ export default function WelcomePage() {
   return (
     <main className="flex min-h-dvh flex-col bg-background px-6">
       <div className="flex flex-1 flex-col items-center justify-center py-12">
-        <div className="relative">
-          <div className="grid h-20 w-20 place-items-center rounded-3xl border border-[#a8a29e] text-[#57534e]">
-            <Link size={40} strokeWidth={1.5} />
-          </div>
-          <div className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-xl border border-[#a8a29e] bg-white text-[#57534e]">
-            <Bookmark size={16} strokeWidth={2} />
-          </div>
+        <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-2xl">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.jpg"
+            alt="口袋链"
+            className="h-full w-full object-cover"
+          />
         </div>
 
         <h1 className="mt-7 text-3xl font-bold tracking-tight text-[#57534e]">
