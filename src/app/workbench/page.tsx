@@ -202,7 +202,7 @@ export default function WorkbenchPage() {
 
   return (
     <div
-      className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[110px]"
+      className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]"
       style={themeStyle}
     >
       <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-sand bg-brand px-4">

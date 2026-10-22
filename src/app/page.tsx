@@ -78,7 +78,7 @@ export default function WelcomePage() {
           href="https://beian.miit.gov.cn/"
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-muted"
+          className="text-[10px] text-muted opacity-50"
         >
           蜀ICP备2026063684号-1
         </a>

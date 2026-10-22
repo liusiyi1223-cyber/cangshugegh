@@ -32,7 +32,7 @@ export default function StatsPage() {
   const totalFavorites = users.reduce((s, u) => s + u._count.favorites, 0);
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[110px]" style={themeStyle}>
+    <div className="mx-auto min-h-dvh w-full max-w-[1000px] bg-background pb-[90px]" style={themeStyle}>
       <header className="sticky top-0 z-30 border-b border-sand bg-brand px-4 pb-3 pt-4">
         <h1 className="text-lg font-bold tracking-tight text-onbrand">用户管理</h1>
         <p className="mt-1 text-xs text-onbrand opacity-70">查看注册用户</p>

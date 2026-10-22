@@ -226,7 +226,7 @@ export default function FavoritesPage() {
   }, [filtered, colCount]);
 
   return (
-    <div className="min-h-dvh bg-background pb-[110px]" style={themeStyle}>
+    <div className="min-h-dvh bg-background pb-[90px]" style={themeStyle}>
       <header className="sticky top-0 z-20 flex h-12 items-center justify-between border-b border-sand bg-brand px-4">
         <div className="flex items-center gap-2.5">
           <button

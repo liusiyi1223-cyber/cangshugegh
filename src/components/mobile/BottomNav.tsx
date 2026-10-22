@@ -72,15 +72,6 @@ export default function BottomNav() {
         ))}
       </div>
 
-      <a
-        href="https://beian.miit.gov.cn/"
-        target="_blank"
-        rel="noreferrer"
-        className="block pb-1 text-center text-[10px] leading-none text-onbrand opacity-60"
-      >
-        蜀ICP备2026063684号-1
-      </a>
-
       <AddFavoriteSheet
         open={addOpen}
         onClose={() => setAddOpen(false)}
