@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { Prisma } from "@prisma/client";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { db } from "./db";
 
 const SESSION_COOKIE = "session";
@@ -26,13 +26,17 @@ export async function verifyPassword(
   return bcrypt.compare(password, passwordHash);
 }
 
-export async function createSession(userId: string): Promise<void> {
-  const token = await new SignJWT({})
+export async function signToken(userId: string): Promise<string> {
+  return new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
     .setExpirationTime("30d")
     .sign(secret);
+}
+
+export async function createSession(userId: string): Promise<void> {
+  const token = await signToken(userId);
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
@@ -59,8 +63,13 @@ export async function getSessionUser(): Promise<{
   role: string;
   preferences: Prisma.JsonValue | null;
 } | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  let token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!token) {
+    const authHeader = (await headers()).get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.slice("Bearer ".length);
+    }
+  }
   if (!token) return null;
 
   try {

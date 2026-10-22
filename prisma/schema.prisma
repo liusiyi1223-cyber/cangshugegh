@@ -17,6 +17,7 @@ model User {
   passwordHash String
   name         String?
   avatar       String?
+  openid       String?    @unique
   tags         String[]   @default([])
   platforms    String[]   @default([])
   role         String     @default("USER")
