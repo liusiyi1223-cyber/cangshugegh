@@ -16,8 +16,8 @@ describe("xiaohongshuAdapter.match", () => {
     ).toBe(true);
   });
 
-  it("不匹配短链 xhslink.com（需先还原）", () => {
-    expect(xiaohongshuAdapter.match("https://xhslink.com/a/AbCdEf")).toBe(false);
+  it("匹配短链 xhslink.com", () => {
+    expect(xiaohongshuAdapter.match("https://xhslink.com/a/AbCdEf")).toBe(true);
   });
 
   it("不匹配其他域名", () => {

@@ -14,8 +14,8 @@ describe("youtubeAdapter.match", () => {
     expect(youtubeAdapter.match("https://www.youtube.com/watch?v=AbCdEf12345")).toBe(true);
   });
 
-  it("不匹配短链 youtu.be（需先还原）", () => {
-    expect(youtubeAdapter.match("https://youtu.be/AbCdEf12345")).toBe(false);
+  it("匹配短链 youtu.be", () => {
+    expect(youtubeAdapter.match("https://youtu.be/AbCdEf12345")).toBe(true);
   });
 
   it("不匹配其他域名", () => {
