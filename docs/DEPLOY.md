@@ -37,7 +37,7 @@ sudo apt-get install -y git nginx
 验证：
 
 ```bash
-node -v   # 应显示 v20.x
+node -v   # 应显示 v24.x（Node >= 22.19，低于会 build 失败）
 psql --version
 ```
 
@@ -61,6 +61,10 @@ CREATE DATABASE cangshuge OWNER cangshuge;
 # 用 HTTPS 拉取（服务器上没配 SSH 的话）
 git clone https://github.com/liusiyi1223-cyber/cangshugegh.git
 cd cangshugegh
+
+# 配置 npm 国内镜像（不配的话用国外源，下载极慢甚至卡死服务器）
+npm config set registry https://registry.npmmirror.com
+
 npm install
 ```
 
@@ -174,11 +178,14 @@ sudo certbot --nginx -d 你的域名
 ```bash
 cd ~/cangshugegh
 git pull
-npm install
+npm ci --no-audit --no-fund
+npx prisma generate
 npx prisma migrate deploy
 npm run build
 pm2 restart cangshuge
 ```
+
+> 注意：`npm ci` 后必须 `npx prisma generate`——Prisma 7 不会在安装时自动生成客户端，缺了这步 `next build` 的类型检查会报 `f.tags` 隐式 any（TS7006）。
 
 ## 十二、封面图存储说明
 
