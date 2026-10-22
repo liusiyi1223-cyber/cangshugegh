@@ -26,7 +26,7 @@ export async function PATCH(request: Request) {
     throw e;
   }
 
-  let body: { name?: string; avatar?: string; tags?: string[]; preferences?: Record<string, unknown> };
+  let body: { name?: string; avatar?: string; tags?: string[]; platforms?: string[]; preferences?: Record<string, unknown> };
   try {
     body = await request.json();
   } catch {
@@ -37,6 +37,7 @@ export async function PATCH(request: Request) {
     name?: string | null;
     avatar?: string | null;
     tags?: string[];
+    platforms?: string[];
     preferences?: Prisma.InputJsonValue;
   } = {};
 
@@ -73,6 +74,10 @@ export async function PATCH(request: Request) {
     }
   }
 
+  if (Array.isArray(body.platforms)) {
+    data.platforms = body.platforms.filter((p): p is string => typeof p === "string");
+  }
+
   if (body.preferences && typeof body.preferences === "object") {
     const old = await db.user.findUnique({
       where: { id: user.id },
@@ -95,6 +100,7 @@ export async function PATCH(request: Request) {
       name: true,
       avatar: true,
       tags: true,
+      platforms: true,
       role: true,
       preferences: true,
     },

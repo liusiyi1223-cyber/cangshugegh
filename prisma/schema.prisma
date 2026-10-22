@@ -18,6 +18,7 @@ model User {
   name         String?
   avatar       String?
   tags         String[]   @default([])
+  platforms    String[]   @default([])
   role         String     @default("USER")
   preferences  Json?
   createdAt    DateTime   @default(now())

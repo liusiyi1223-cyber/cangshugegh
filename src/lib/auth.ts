@@ -55,6 +55,7 @@ export async function getSessionUser(): Promise<{
   name: string | null;
   avatar: string | null;
   tags: string[];
+  platforms: string[];
   role: string;
   preferences: Prisma.JsonValue | null;
 } | null> {
@@ -74,6 +75,7 @@ export async function getSessionUser(): Promise<{
         name: true,
         avatar: true,
         tags: true,
+        platforms: true,
         role: true,
         preferences: true,
       },
@@ -90,6 +92,7 @@ export async function requireUser(): Promise<{
   name: string | null;
   avatar: string | null;
   tags: string[];
+  platforms: string[];
   role: string;
   preferences: Prisma.JsonValue | null;
 }> {

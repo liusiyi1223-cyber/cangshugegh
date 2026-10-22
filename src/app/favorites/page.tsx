@@ -54,6 +54,7 @@ export default function FavoritesPage() {
   );
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [userTags, setUserTags] = useState<string[]>([]);
+  const [userPlatforms, setUserPlatforms] = useState<string[]>([]);
   const [aiIds, setAiIds] = useState<string[] | null>(null);
   const [aiHistory, setAiHistory] = useState<string[]>([]);
   const queryRef = useRef(query);
@@ -80,6 +81,7 @@ export default function FavoritesPage() {
       setUserName(u.name ?? "");
       setUserAvatar(u.avatar ?? "");
       setUserTags(u.tags ?? []);
+      setUserPlatforms(u.platforms ?? []);
     }
     setLoading(false);
   }, []);
@@ -196,9 +198,8 @@ export default function FavoritesPage() {
   }, [items, query, filter, tagFilter, aiIds]);
 
   const filterOptions = useMemo(() => {
-    const used = new Set(items.map((it) => it.platform).filter(Boolean));
-    return [{ key: "all", name: "全部" }, ...PLATFORMS.filter((p) => used.has(p.key))];
-  }, [items]);
+    return [{ key: "all", name: "全部" }, ...PLATFORMS.filter((p) => userPlatforms.includes(p.key))];
+  }, [userPlatforms]);
 
   useEffect(() => {
     if (filter !== "all" && !filterOptions.some((p) => p.key === filter)) {

@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CalendarDays, CopyCheck, Download, Eye, Sparkles, Tag as TagIcon, Trash2 } from "lucide-react";
+import { CalendarDays, CopyCheck, Download, Eye, Layers, Sparkles, Tag as TagIcon, Trash2 } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
-import { platformName } from "@/lib/platforms";
+import { PLATFORMS, platformName } from "@/lib/platforms";
 import { useThemeColor } from "@/lib/useThemeColor";
 import { useHideVisitCount } from "@/lib/useHideVisitCount";
 import BottomNav from "@/components/mobile/BottomNav";
@@ -11,6 +11,7 @@ import BottomNav from "@/components/mobile/BottomNav";
 export default function WorkbenchPage() {
   const [favorites, setFavorites] = useState<FavoriteWithCollections[]>([]);
   const [userTags, setUserTags] = useState<string[]>([]);
+  const [userPlatforms, setUserPlatforms] = useState<string[]>([]);
   const [newTagName, setNewTagName] = useState("");
   const { themeStyle } = useThemeColor();
   const { hide, setHideVisitCount } = useHideVisitCount();
@@ -21,7 +22,11 @@ export default function WorkbenchPage() {
       fetch("/api/auth/me"),
     ]);
     if (fr.ok) setFavorites(await fr.json());
-    if (ur.ok) setUserTags((await ur.json()).tags ?? []);
+    if (ur.ok) {
+      const u = await ur.json();
+      setUserTags(u.tags ?? []);
+      setUserPlatforms(u.platforms ?? []);
+    }
   }, []);
 
   useEffect(() => {
@@ -88,6 +93,24 @@ export default function WorkbenchPage() {
     }).catch(() => {});
     setUserTags(next);
     await load();
+  }
+
+  async function setPlatforms(next: string[]) {
+    const res = await fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ platforms: next }),
+    });
+    if (res.ok) setUserPlatforms(next);
+  }
+
+  function removePlatform(key: string) {
+    setPlatforms(userPlatforms.filter((k) => k !== key));
+  }
+
+  function addPlatform(key: string) {
+    if (userPlatforms.includes(key)) return;
+    setPlatforms([...userPlatforms, key]);
   }
 
   function download(filename: string, content: string) {
@@ -359,6 +382,43 @@ export default function WorkbenchPage() {
                     {f.visitCount} 次
                   </span>
                 </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
+          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+            <Layers size={16} className="text-ink" />
+            平台管理
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {PLATFORMS.filter((p) => userPlatforms.includes(p.key)).map((p) => (
+              <span
+                key={p.key}
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft ring-1 ring-sand px-3 py-1.5 text-[13px] text-ink"
+              >
+                {p.name}
+                <button
+                  onClick={() => removePlatform(p.key)}
+                  aria-label={`移除平台 ${p.name}`}
+                  className="text-ink/60 hover:text-ink"
+                >
+                  <Trash2 size={13} strokeWidth={2} />
+                </button>
+              </span>
+            ))}
+          </div>
+          {PLATFORMS.filter((p) => !userPlatforms.includes(p.key)).length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {PLATFORMS.filter((p) => !userPlatforms.includes(p.key)).map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => addPlatform(p.key)}
+                  className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-muted"
+                >
+                  + {p.name}
+                </button>
               ))}
             </div>
           )}
