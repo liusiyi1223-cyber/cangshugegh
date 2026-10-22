@@ -30,6 +30,7 @@ export default function AddFavoriteSheet({
   const [showManual, setShowManual] = useState(false);
   const [manualUrl, setManualUrl] = useState("");
   const [manualTitle, setManualTitle] = useState("");
+  const [manualCover, setManualCover] = useState("");
   const [loading, setLoading] = useState(false);
   const [aiTags, setAiTags] = useState<string[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -46,6 +47,7 @@ export default function AddFavoriteSheet({
     setShowManual(false);
     setManualUrl("");
     setManualTitle("");
+    setManualCover("");
     setLoading(false);
     setAiTags([]);
     fetch("/api/auth/me")
@@ -123,6 +125,7 @@ export default function AddFavoriteSheet({
       body: JSON.stringify({
         url: u,
         title: t,
+        cover: manualCover.trim() || undefined,
         tags: parseTags(tagInput),
         platform,
         icon: aiIcon || undefined,
@@ -269,6 +272,14 @@ export default function AddFavoriteSheet({
 
       {error && <p className="mt-3 text-xs text-danger">{error}</p>}
 
+      <button
+        type="button"
+        onClick={() => setShowManual((v) => !v)}
+        className="mt-3 w-full text-center text-xs text-muted"
+      >
+        {showManual ? "收起手动添加" : "手动添加（填链接、标题、封面）"}
+      </button>
+
       {showManual && (
         <div className="mt-4 rounded-xl bg-cream p-3 ring-1 ring-sand">
           <p className="text-xs font-medium text-ink">手动添加</p>
@@ -282,6 +293,12 @@ export default function AddFavoriteSheet({
             value={manualTitle}
             onChange={(e) => setManualTitle(e.target.value)}
             placeholder="标题 *"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
+          />
+          <input
+            value={manualCover}
+            onChange={(e) => setManualCover(e.target.value)}
+            placeholder="封面链接（选填）"
             className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
           />
           <button
