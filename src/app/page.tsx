@@ -60,7 +60,7 @@ export default function WelcomePage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-sm pb-10">
+      <div className="mx-auto w-full max-w-sm pb-4">
         <a
           href="/login"
           className="flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-[#a8a29e] text-[15px] font-semibold text-[#57534e]"
@@ -75,6 +75,17 @@ export default function WelcomePage() {
             没有账号？<span className="text-[#57534e] font-medium">注册</span>
           </a>
         </div>
+      </div>
+
+      <div className="pb-6 text-center">
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs text-muted"
+        >
+          蜀ICP备2026063684号-1
+        </a>
       </div>
     </main>
   );
