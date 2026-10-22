@@ -169,7 +169,8 @@ export default function WorkbenchPage() {
     }
   }
 
-  const [duplicateIds, setDuplicateIds] = useState<string[]>([]);
+  const [urlDuplicates, setUrlDuplicates] = useState<string[]>([]);
+  const [similarIds, setSimilarIds] = useState<string[]>([]);
   const [dedupeLoading, setDedupeLoading] = useState(false);
   const [dedupeDone, setDedupeDone] = useState(false);
   const [dedupeError, setDedupeError] = useState("");
@@ -182,12 +183,13 @@ export default function WorkbenchPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: favorites.map((f) => ({ id: f.id, title: f.title })),
+          items: favorites.map((f) => ({ id: f.id, title: f.title, url: f.url })),
         }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setDuplicateIds(data.duplicateIds ?? []);
+        setUrlDuplicates(data.urlDuplicates ?? []);
+        setSimilarIds(data.similarIds ?? []);
         setDedupeDone(true);
       } else {
         setDedupeError(data.error ?? "检测失败，请稍后重试");
@@ -202,8 +204,33 @@ export default function WorkbenchPage() {
   async function removeDuplicate(id: string) {
     if (!confirm("确定删除这条重复收藏？")) return;
     await fetch(`/api/favorites/${id}`, { method: "DELETE" });
-    setDuplicateIds((prev) => prev.filter((x) => x !== id));
+    setUrlDuplicates((prev) => prev.filter((x) => x !== id));
+    setSimilarIds((prev) => prev.filter((x) => x !== id));
     await load();
+  }
+
+  function renderDupItem(id: string, label: string, labelClass: string) {
+    const f = favorites.find((x) => x.id === id);
+    if (!f) return null;
+    return (
+      <div key={id} className="flex items-center gap-2 rounded-lg bg-cream px-3 py-2">
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] text-ink">{f.title}</div>
+          <div className="truncate text-[11px] text-muted">
+            {platformName(f.platform)}
+          </div>
+        </div>
+        <span className={`shrink-0 rounded px-2 py-0.5 text-[11px] ${labelClass}`}>
+          {label}
+        </span>
+        <button
+          onClick={() => removeDuplicate(id)}
+          className="shrink-0 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600"
+        >
+          删除
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -286,32 +313,36 @@ export default function WorkbenchPage() {
             <CopyCheck size={16} className="text-ink" />
             智能去重
           </div>
-          {duplicateIds.length > 0 ? (
-            <div className="space-y-2">
-              <p className="text-xs text-muted">发现 {duplicateIds.length} 条疑似重复：</p>
-              {duplicateIds.map((id) => {
-                const f = favorites.find((x) => x.id === id);
-                if (!f) return null;
-                return (
-                  <div key={id} className="flex items-center gap-2 rounded-lg bg-cream px-3 py-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13px] text-ink">{f.title}</div>
-                      <div className="truncate text-[11px] text-muted">
-                        {platformName(f.platform)}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeDuplicate(id)}
-                      className="shrink-0 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600"
-                    >
-                      删除
-                    </button>
+          {urlDuplicates.length > 0 || similarIds.length > 0 ? (
+            <div className="space-y-3">
+              {urlDuplicates.length > 0 && (
+                <div>
+                  <p className="mb-2 text-xs text-muted">
+                    链接重复 · {urlDuplicates.length} 条
+                  </p>
+                  <div className="space-y-2">
+                    {urlDuplicates.map((id) =>
+                      renderDupItem(id, "链接相同", "bg-red-50 text-red-600")
+                    )}
                   </div>
-                );
-              })}
+                </div>
+              )}
+              {similarIds.length > 0 && (
+                <div>
+                  <p className="mb-2 text-xs text-muted">
+                    疑似相似 · {similarIds.length} 条
+                  </p>
+                  <div className="space-y-2">
+                    {similarIds.map((id) =>
+                      renderDupItem(id, "标题相似", "bg-amber-50 text-amber-600")
+                    )}
+                  </div>
+                </div>
+              )}
               <button
                 onClick={() => {
-                  setDuplicateIds([]);
+                  setUrlDuplicates([]);
+                  setSimilarIds([]);
                   setDedupeDone(false);
                 }}
                 className="w-full rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2 text-xs font-medium text-ink"
