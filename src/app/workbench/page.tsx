@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CalendarDays, CopyCheck, Download, Eye, Layers, Sparkles, Tag as TagIcon, Trash2 } from "lucide-react";
+import { CalendarDays, ChevronDown, CopyCheck, Download, Eye, Layers, Sparkles, Tag as TagIcon, Trash2 } from "lucide-react";
 import type { FavoriteWithCollections } from "@/lib/types";
 import { PLATFORMS, platformName } from "@/lib/platforms";
 import { useThemeColor } from "@/lib/useThemeColor";
@@ -15,6 +15,11 @@ export default function WorkbenchPage() {
   const [newTagName, setNewTagName] = useState("");
   const { themeStyle } = useThemeColor();
   const { hide, setHideVisitCount } = useHideVisitCount();
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  function toggleSection(key: string) {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
 
   const load = useCallback(async () => {
     const [fr, ur] = await Promise.all([
@@ -137,11 +142,6 @@ export default function WorkbenchPage() {
     download(`收藏备份_${new Date().toISOString().slice(0, 10)}.md`, content);
   }
 
-  function exportJson() {
-    const content = JSON.stringify(favorites, null, 2);
-    download(`收藏备份_${new Date().toISOString().slice(0, 10)}.json`, content);
-  }
-
   const [aiSummary, setAiSummary] = useState("");
   const [summaryLoading, setSummaryLoading] = useState(false);
 
@@ -238,20 +238,12 @@ export default function WorkbenchPage() {
             <Download size={16} className="text-ink" />
             导出备份
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={exportMarkdown}
-              className="flex-1 rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2.5 text-sm font-medium text-ink"
-            >
-              导出 Markdown
-            </button>
-            <button
-              onClick={exportJson}
-              className="flex-1 rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2.5 text-sm font-medium text-ink"
-            >
-              导出 JSON
-            </button>
-          </div>
+          <button
+            onClick={exportMarkdown}
+            className="w-full rounded-xl bg-brand-soft ring-1 ring-sand px-4 py-2.5 text-sm font-medium text-ink"
+          >
+            导出 Markdown
+          </button>
         </section>
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
@@ -326,148 +318,200 @@ export default function WorkbenchPage() {
         </section>
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+          <button
+            onClick={() => toggleSection("timeline")}
+            className="flex w-full items-center gap-2 text-sm font-semibold text-ink"
+          >
             <CalendarDays size={16} className="text-ink" />
             收藏时间线
-          </div>
-          {groupedByDate.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted">还没有收藏</p>
-          ) : (
-            <div className="space-y-3">
-              {groupedByDate.map(({ date, items }) => (
-                <div key={date}>
-                  <div className="mb-1 text-xs font-medium text-muted">
-                    {date} · {items.length} 条
-                  </div>
-                  <div className="space-y-1">
-                    {items.map((f) => (
-                      <div key={f.id}>
-                        <div className="truncate text-[13px] text-ink">{f.title}</div>
-                        {f.note && (
-                          <div className="truncate pl-2 text-xs text-muted">{f.note}</div>
-                        )}
+            <ChevronDown
+              size={16}
+              className={`ml-auto text-muted transition-transform ${
+                openSections.timeline ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {openSections.timeline && (
+            <div className="mt-3">
+              {groupedByDate.length === 0 ? (
+                <p className="py-4 text-center text-sm text-muted">还没有收藏</p>
+              ) : (
+                <div className="space-y-3">
+                  {groupedByDate.map(({ date, items }) => (
+                    <div key={date}>
+                      <div className="mb-1 text-xs font-medium text-muted">
+                        {date} · {items.length} 条
                       </div>
-                    ))}
-                  </div>
+                      <div className="space-y-1">
+                        {items.map((f) => (
+                          <div key={f.id}>
+                            <div className="truncate text-[13px] text-ink">{f.title}</div>
+                            {f.note && (
+                              <div className="truncate pl-2 text-xs text-muted">{f.note}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </section>
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+          <button
+            onClick={() => toggleSection("visits")}
+            className="flex w-full items-center gap-2 text-sm font-semibold text-ink"
+          >
             <Eye size={16} className="text-ink" />
             访问数据
-          </div>
-          <div className="mb-3 flex items-baseline gap-2">
-            <span className="text-[26px] font-bold tracking-tight text-ink">
-              {totalVisits}
-            </span>
-            <span className="text-xs text-muted">总访问次数</span>
-          </div>
-          {topVisited.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted">还没有访问记录</p>
-          ) : (
-            <div className="space-y-2">
-              {topVisited.map((f, i) => (
-                <div key={f.id} className="flex items-center gap-2">
-                  <span className="w-4 shrink-0 text-xs font-semibold text-muted">
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
-                    {f.title}
-                  </span>
-                  <span className="shrink-0 text-xs text-muted">
-                    {f.visitCount} 次
-                  </span>
+            <ChevronDown
+              size={16}
+              className={`ml-auto text-muted transition-transform ${
+                openSections.visits ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {openSections.visits && (
+            <div className="mt-3">
+              <div className="mb-3 flex items-baseline gap-2">
+                <span className="text-[26px] font-bold tracking-tight text-ink">
+                  {totalVisits}
+                </span>
+                <span className="text-xs text-muted">总访问次数</span>
+              </div>
+              {topVisited.length === 0 ? (
+                <p className="py-4 text-center text-sm text-muted">还没有访问记录</p>
+              ) : (
+                <div className="space-y-2">
+                  {topVisited.map((f, i) => (
+                    <div key={f.id} className="flex items-center gap-2">
+                      <span className="w-4 shrink-0 text-xs font-semibold text-muted">
+                        {i + 1}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
+                        {f.title}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted">
+                        {f.visitCount} 次
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </section>
 
         <section className="mb-4 rounded-2xl bg-white p-4 shadow-card">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+          <button
+            onClick={() => toggleSection("platforms")}
+            className="flex w-full items-center gap-2 text-sm font-semibold text-ink"
+          >
             <Layers size={16} className="text-ink" />
             平台管理
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {PLATFORMS.filter((p) => userPlatforms.includes(p.key)).map((p) => (
-              <span
-                key={p.key}
-                className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft ring-1 ring-sand px-3 py-1.5 text-[13px] text-ink"
-              >
-                {p.name}
-                <button
-                  onClick={() => removePlatform(p.key)}
-                  aria-label={`移除平台 ${p.name}`}
-                  className="text-ink/60 hover:text-ink"
-                >
-                  <Trash2 size={13} strokeWidth={2} />
-                </button>
-              </span>
-            ))}
-          </div>
-          {PLATFORMS.filter((p) => !userPlatforms.includes(p.key)).length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {PLATFORMS.filter((p) => !userPlatforms.includes(p.key)).map((p) => (
-                <button
-                  key={p.key}
-                  onClick={() => addPlatform(p.key)}
-                  className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-muted"
-                >
-                  + {p.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-2xl bg-white p-4 shadow-card">
-          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <TagIcon size={16} className="text-ink" />
-            标签管理
-          </div>
-          <div className="mb-3 flex gap-2">
-            <input
-              value={newTagName}
-              onChange={(e) => setNewTagName(e.target.value)}
-              placeholder="新建标签"
-              className="min-w-0 flex-1 rounded-xl border border-sand bg-white px-3 py-2 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
+            <ChevronDown
+              size={16}
+              className={`ml-auto text-muted transition-transform ${
+                openSections.platforms ? "rotate-180" : ""
+              }`}
             />
-            <button
-              onClick={createTag}
-              disabled={!newTagName.trim()}
-              className="shrink-0 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-onbrand ring-1 ring-sand disabled:opacity-50"
-            >
-              新建
-            </button>
-          </div>
-          {userTags.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted">还没有标签</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {[...userTags]
-                .sort((a, b) => (tagCounts.get(b) ?? 0) - (tagCounts.get(a) ?? 0))
-                .map((tag) => (
+          </button>
+          {openSections.platforms && (
+            <div className="mt-3">
+              <div className="flex flex-wrap gap-2">
+                {PLATFORMS.filter((p) => userPlatforms.includes(p.key)).map((p) => (
                   <span
-                    key={tag}
+                    key={p.key}
                     className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft ring-1 ring-sand px-3 py-1.5 text-[13px] text-ink"
                   >
-                    {tag}
-                    <span className="text-[11px] text-muted">
-                      {tagCounts.get(tag) ?? 0}
-                    </span>
+                    {p.name}
                     <button
-                      onClick={() => removeTag(tag)}
-                      aria-label={`删除标签 ${tag}`}
+                      onClick={() => removePlatform(p.key)}
+                      aria-label={`移除平台 ${p.name}`}
                       className="text-ink/60 hover:text-ink"
                     >
                       <Trash2 size={13} strokeWidth={2} />
                     </button>
                   </span>
                 ))}
+              </div>
+              {PLATFORMS.filter((p) => !userPlatforms.includes(p.key)).length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {PLATFORMS.filter((p) => !userPlatforms.includes(p.key)).map((p) => (
+                    <button
+                      key={p.key}
+                      onClick={() => addPlatform(p.key)}
+                      className="rounded-full bg-tag px-2.5 py-1 text-[12px] text-muted"
+                    >
+                      + {p.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-2xl bg-white p-4 shadow-card">
+          <button
+            onClick={() => toggleSection("tags")}
+            className="flex w-full items-center gap-2 text-sm font-semibold text-ink"
+          >
+            <TagIcon size={16} className="text-ink" />
+            标签管理
+            <ChevronDown
+              size={16}
+              className={`ml-auto text-muted transition-transform ${
+                openSections.tags ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {openSections.tags && (
+            <div className="mt-3">
+              <div className="mb-3 flex gap-2">
+                <input
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  placeholder="新建标签"
+                  className="min-w-0 flex-1 rounded-xl border border-sand bg-white px-3 py-2 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
+                />
+                <button
+                  onClick={createTag}
+                  disabled={!newTagName.trim()}
+                  className="shrink-0 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-onbrand ring-1 ring-sand disabled:opacity-50"
+                >
+                  新建
+                </button>
+              </div>
+              {userTags.length === 0 ? (
+                <p className="py-4 text-center text-sm text-muted">还没有标签</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {[...userTags]
+                    .sort((a, b) => (tagCounts.get(b) ?? 0) - (tagCounts.get(a) ?? 0))
+                    .map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft ring-1 ring-sand px-3 py-1.5 text-[13px] text-ink"
+                      >
+                        {tag}
+                        <span className="text-[11px] text-muted">
+                          {tagCounts.get(tag) ?? 0}
+                        </span>
+                        <button
+                          onClick={() => removeTag(tag)}
+                          aria-label={`删除标签 ${tag}`}
+                          className="text-ink/60 hover:text-ink"
+                        >
+                          <Trash2 size={13} strokeWidth={2} />
+                        </button>
+                      </span>
+                    ))}
+                </div>
+              )}
             </div>
           )}
         </section>
