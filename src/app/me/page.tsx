@@ -328,13 +328,13 @@ export default function MePage() {
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
           placeholder="昵称"
-          className="w-full rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+          className="w-full rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
         />
         {editError && <p className="mt-2 text-xs text-danger">{editError}</p>}
         <button
           onClick={saveProfile}
           disabled={editBusy}
-          className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+          className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-onbrand disabled:opacity-55"
         >
           {editBusy ? "保存中…" : "保存"}
         </button>
@@ -356,7 +356,7 @@ export default function MePage() {
               onChange={(e) => setFeedbackText(e.target.value)}
               placeholder="描述你遇到的问题，或想反馈的建议…"
               rows={5}
-              className="w-full resize-none rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+              className="w-full resize-none rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
             />
             {feedbackError && (
               <p className="mt-2 text-xs text-danger">{feedbackError}</p>
@@ -364,7 +364,7 @@ export default function MePage() {
             <button
               onClick={submitFeedback}
               disabled={!feedbackText.trim() || feedbackBusy}
-              className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+              className="mt-4 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-onbrand disabled:opacity-55"
             >
               {feedbackBusy ? "提交中…" : "提交"}
             </button>

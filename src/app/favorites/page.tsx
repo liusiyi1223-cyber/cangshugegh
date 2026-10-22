@@ -323,7 +323,7 @@ export default function FavoritesPage() {
                 </div>
               )}
 
-              <div className="flex h-9 items-center gap-2 rounded-xl bg-cream px-3 text-muted focus-within:ring-1 focus-within:ring-brand">
+              <div className="flex h-9 items-center gap-2 rounded-xl bg-cream px-3 text-muted focus-within:ring-1 focus-within:ring-brand-ink">
                 <Search size={17} strokeWidth={1.8} />
                 <input
                   id="searchbox"

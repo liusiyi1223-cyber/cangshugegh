@@ -178,7 +178,7 @@ export default function AddFavoriteSheet({
         placeholder="粘贴分享文本或链接…"
         autoFocus
         rows={3}
-        className="w-full resize-none rounded-xl bg-cream p-3 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        className="w-full resize-none rounded-xl bg-cream p-3 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
       />
 
       <textarea
@@ -187,7 +187,7 @@ export default function AddFavoriteSheet({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="标题（自动识别，可修改）"
         rows={1}
-        className="mt-2 w-full resize-none overflow-hidden rounded-xl bg-cream px-3 py-2.5 text-xs text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        className="mt-2 w-full resize-none overflow-hidden rounded-xl bg-cream px-3 py-2.5 text-xs text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
       />
 
       {userTags.length > 0 && (
@@ -214,7 +214,7 @@ export default function AddFavoriteSheet({
         value={tagInput}
         onChange={(e) => setTagInput(e.target.value)}
         placeholder="新建标签（逗号分隔）"
-        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-xs text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+        className="mt-2 w-full rounded-xl bg-cream px-3 py-2.5 text-xs text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
       />
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
@@ -248,7 +248,7 @@ export default function AddFavoriteSheet({
         <select
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
-          className="min-w-0 flex-1 rounded-xl bg-white px-3 py-2.5 text-xs text-ink ring-1 ring-sand focus:outline-none focus:ring-brand"
+          className="min-w-0 flex-1 rounded-xl bg-white px-3 py-2.5 text-xs text-ink ring-1 ring-sand focus:outline-none focus:ring-brand-ink"
         >
           <option value="other">其他 / 自动识别</option>
           {PLATFORMS.map((p) => (
@@ -276,13 +276,13 @@ export default function AddFavoriteSheet({
             value={manualUrl}
             onChange={(e) => setManualUrl(e.target.value)}
             placeholder="链接 *"
-            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
           />
           <input
             value={manualTitle}
             onChange={(e) => setManualTitle(e.target.value)}
             placeholder="标题 *"
-            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+            className="mt-2 w-full rounded-lg bg-white px-3 py-2 text-sm text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
           />
           <button
             type="button"

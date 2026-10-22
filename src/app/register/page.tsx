@@ -25,6 +25,7 @@ export default function RegisterPage() {
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [error, setError] = useState("");
+  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -68,6 +69,10 @@ export default function RegisterPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setError("请先勾选同意《隐私政策》");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -89,7 +94,7 @@ export default function RegisterPage() {
   return (
     <main className="grid min-h-dvh place-items-center bg-background p-6">
       <div className="w-full max-w-[400px] rounded-2xl bg-white p-7 shadow-card">
-        <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-2xl bg-brand-soft text-brand">
+        <div className="mb-5 grid h-[50px] w-[50px] place-items-center rounded-2xl bg-brand-soft text-brand-ink">
           <Bookmark size={27} strokeWidth={1.8} />
         </div>
         <h1 className="text-[25px] font-extrabold tracking-tight text-ink">
@@ -134,7 +139,7 @@ export default function RegisterPage() {
             placeholder="设置你的昵称"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+            className="w-full rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
           />
 
           <label className="mb-1.5 mt-3.5 block text-xs font-semibold text-ink">
@@ -153,7 +158,7 @@ export default function RegisterPage() {
               placeholder="请输入邮箱"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-sand py-3 pl-10 pr-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+              className="w-full rounded-xl border border-sand py-3 pl-10 pr-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
             />
           </div>
 
@@ -167,13 +172,13 @@ export default function RegisterPage() {
               placeholder="6 位验证码"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="min-w-0 flex-1 rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+              className="min-w-0 flex-1 rounded-xl border border-sand px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
             />
             <button
               type="button"
               onClick={sendCode}
               disabled={sending || countdown > 0}
-              className="shrink-0 rounded-xl border border-sand px-3.5 text-[13px] font-medium text-brand disabled:opacity-55"
+              className="shrink-0 rounded-xl border border-sand px-3.5 text-[13px] font-medium text-brand-ink disabled:opacity-55"
             >
               {countdown > 0 ? `${countdown}s 后重发` : "发送验证码"}
             </button>
@@ -196,7 +201,7 @@ export default function RegisterPage() {
               placeholder="请输入密码（至少 8 位）"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-sand py-3 pl-10 pr-11 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+              className="w-full rounded-xl border border-sand py-3 pl-10 pr-11 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
             />
             <button
               type="button"
@@ -214,10 +219,25 @@ export default function RegisterPage() {
 
           {error && <p className="mt-2 text-xs text-danger">{error}</p>}
 
+          <label className="mt-4 flex items-start gap-2 text-[13px] text-muted">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-brand-ink"
+            />
+            <span>
+              我已阅读并同意
+              <Link href="/privacy" className="text-brand-ink">
+                《隐私政策》
+              </Link>
+            </span>
+          </label>
+
           <button
             type="submit"
             disabled={busy}
-            className="mt-5 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-white disabled:opacity-55"
+            className="mt-5 w-full rounded-xl bg-brand py-3 text-[13px] font-semibold text-onbrand disabled:opacity-55"
           >
             {busy ? "请稍候…" : "创建账号"}
           </button>
@@ -225,13 +245,13 @@ export default function RegisterPage() {
 
         <p className="mt-5 text-center text-[12px] text-muted">
           已有账号？
-          <Link href="/login" replace className="font-medium text-brand">
+          <Link href="/login" replace className="font-medium text-brand-ink">
             登录
           </Link>
         </p>
 
         <p className="mt-3 text-center text-[12px] text-muted">
-          <Link href="/privacy" className="hover:text-brand">
+          <Link href="/privacy" className="hover:text-brand-ink">
             隐私政策
           </Link>
         </p>

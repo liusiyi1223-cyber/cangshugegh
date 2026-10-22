@@ -89,7 +89,7 @@ export default function TagEditSheet({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="标题"
         rows={1}
-        className="w-full resize-none overflow-hidden rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+        className="w-full resize-none overflow-hidden rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
       />
 
       <label className="mb-1.5 mt-4 block text-xs font-semibold text-ink">
@@ -145,7 +145,7 @@ export default function TagEditSheet({
             }
           }}
           placeholder="新建标签"
-          className="min-w-0 flex-1 rounded-full bg-surface px-4 py-2.5 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand"
+          className="min-w-0 flex-1 rounded-full bg-surface px-4 py-2.5 text-base text-ink ring-1 ring-sand placeholder:text-muted focus:outline-none focus:ring-brand-ink"
         />
         <button
           type="button"

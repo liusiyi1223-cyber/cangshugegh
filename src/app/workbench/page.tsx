@@ -434,7 +434,7 @@ export default function WorkbenchPage() {
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               placeholder="新建标签"
-              className="min-w-0 flex-1 rounded-xl border border-sand bg-white px-3 py-2 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+              className="min-w-0 flex-1 rounded-xl border border-sand bg-white px-3 py-2 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
             />
             <button
               onClick={createTag}

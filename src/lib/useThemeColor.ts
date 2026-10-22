@@ -15,7 +15,7 @@ function readStoredTheme(defaultColor: string): string {
   }
 }
 
-export function useThemeColor(defaultColor = "#1b3a63") {
+export function useThemeColor(defaultColor = "#ffffff") {
   const [themeColor, setThemeColorState] = useState(() =>
     readStoredTheme(defaultColor)
   );
@@ -50,9 +50,12 @@ export function useThemeColor(defaultColor = "#1b3a63") {
     }).catch(() => {});
   }
 
+  // 浅色品牌色（如白色）时，文字强调色用深墨色，避免白底白字看不见
+  const isLight = readableOn(themeColor) === "#1d2630";
   const themeStyle = {
     "--color-brand": themeColor,
-    "--color-brand-soft": mixWhite(themeColor, 0.9),
+    "--color-brand-ink": isLight ? "#1d2630" : themeColor,
+    "--color-brand-soft": isLight ? "#f4f6f8" : mixWhite(themeColor, 0.9),
     "--color-brand-dark": darken(themeColor, 0.15),
     "--color-onbrand": readableOn(themeColor),
   } as CSSProperties;

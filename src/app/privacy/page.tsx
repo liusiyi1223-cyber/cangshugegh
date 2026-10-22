@@ -20,7 +20,7 @@ export default function PrivacyPage() {
   return (
     <main className="min-h-dvh bg-background px-6 py-8">
       <div className="mx-auto w-full max-w-[640px]">
-        <Link href="/" className="text-sm text-muted hover:text-brand">
+        <Link href="/" className="text-sm text-muted hover:text-brand-ink">
           ← 返回首页
         </Link>
 

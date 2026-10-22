@@ -240,7 +240,7 @@ export default function FavoriteActionSheet({
           onChange={(e) => setNoteText(e.target.value)}
           placeholder="写点笔记…"
           rows={6}
-          className="w-full resize-none rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand"
+          className="w-full resize-none rounded-xl border border-sand bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-ink"
         />
         {noteError && <p className="mt-2 text-xs text-danger">{noteError}</p>}
         <button
