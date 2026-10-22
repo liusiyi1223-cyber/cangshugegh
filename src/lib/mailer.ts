@@ -11,8 +11,9 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendMail(to: string, subject: string, html: string) {
+  const fromEmail = process.env.SMTP_FROM ?? process.env.SMTP_USER;
   await transporter.sendMail({
-    from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
+    from: `口袋链 <${fromEmail}>`,
     to,
     subject,
     html,

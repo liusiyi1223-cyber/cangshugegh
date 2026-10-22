@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   try {
     await sendMail(
       email,
-      "【我的云收藏夹】验证码",
+      "【口袋链】验证码",
       `<p>你的验证码是：</p><p style="font-size:24px;font-weight:bold;letter-spacing:4px">${code}</p><p>10 分钟内有效，请勿泄露。</p>`
     );
   } catch {
