@@ -16,6 +16,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "口袋链",
   description: "把分散在各平台的收藏，集中管理",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#ffffff",
+  appleWebApp: {
+    capable: true,
+    title: "口袋链",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
